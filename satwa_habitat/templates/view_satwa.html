@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block meta %}<title>Data Satwa</title>{% endblock meta %}
+
+{% block content %}
+{% include "navbar.html" %}
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
+  <div class="max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">Data Satwa</h1>
+      <a href="{% url 'create_satwa' %}" class="text-blue-500 hover:underline">[+ Tambah Satwa]</a>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="table-auto w-full text-sm text-left text-gray-800 dark:text-gray-100 border">
+        <thead class="bg-gray-200 dark:bg-gray-700 text-sm font-semibold">
+          <tr>
+            <th class="border px-4 py-2">Nama Individu</th>
+            <th class="border px-4 py-2">Spesies</th>
+            <th class="border px-4 py-2">Asal Hewan</th>
+            <th class="border px-4 py-2">Tanggal Lahir</th>
+            <th class="border px-4 py-2">Status Kesehatan</th>
+            <th class="border px-4 py-2">Habitat</th>
+            <th class="border px-4 py-2">Foto</th>
+            <th class="border px-4 py-2">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for h in satwa_list %}
+          <tr class="bg-white dark:bg-gray-800">
+            <td class="border px-4 py-2">{{ h.nama }}</td>
+            <td class="border px-4 py-2">{{ h.spesies }}</td>
+            <td class="border px-4 py-2">{{ h.asal }}</td>
+            <td class="border px-4 py-2">{{ h.tanggal_lahir }}</td>
+            <td class="border px-4 py-2">{{ h.status }}</td>
+            <td class="border px-4 py-2">{{ h.habitat }}</td>
+            <td class="border px-4 py-2">[foto {{ h.nama|lower }}]</td>
+            <td class="border px-4 py-2 space-x-2">
+              <a href="{% url 'edit_satwa' h.id %}" class="text-blue-500 hover:underline">[Edit]</a>
+              <a href="#" class="text-blue-500 hover:underline">[Hapus]</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock content %}

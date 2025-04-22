@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block meta %}<title>Detail Habitat</title>{% endblock meta %}
+
+{% block content %}
+{% include "navbar.html" %}
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
+  <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-6">
+
+    <div class="flex justify-between items-center">
+      <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">DETAIL HABITAT: {{ habitat.nama }}</h1>
+      <div class="space-x-4">
+        <a href="{% url 'edit_habitat' habitat.id %}" class="text-blue-500 hover:underline">[Edit Habitat]</a>
+        <a href="#" class="text-blue-500 hover:underline">[Hapus Habitat]</a>
+      </div>
+    </div>
+
+    <table class="table-fixed w-full text-sm text-left text-gray-800 dark:text-gray-100 border">
+      <tbody>
+        <tr><td class="border px-4 py-2 w-40 font-semibold">Luas Area</td><td class="border px-4 py-2">{{ habitat.luas }} m²</td></tr>
+        <tr><td class="border px-4 py-2 font-semibold">Status Lingkungan</td><td class="border px-4 py-2">{{ habitat.status }}</td></tr>
+        <tr><td class="border px-4 py-2 font-semibold">Kapasitas Maksimal</td><td class="border px-4 py-2">{{ habitat.kapasitas }} hewan</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mt-6">DAFTAR HEWAN DALAM HABITAT</h2>
+    <table class="table-auto w-full text-sm text-left text-gray-800 dark:text-gray-100 border">
+      <thead class="bg-gray-200 dark:bg-gray-700 font-semibold">
+        <tr>
+          <th class="border px-4 py-2">Nama Individu</th>
+          <th class="border px-4 py-2">Spesies</th>
+          <th class="border px-4 py-2">Asal Hewan</th>
+          <th class="border px-4 py-2">Tanggal Lahir</th>
+          <th class="border px-4 py-2">Status Kesehatan</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for h in hewan_list %}
+        <tr>
+          <td class="border px-4 py-2">{{ h.nama }}</td>
+          <td class="border px-4 py-2">{{ h.spesies }}</td>
+          <td class="border px-4 py-2">{{ h.asal }}</td>
+          <td class="border px-4 py-2">{{ h.tanggal_lahir }}</td>
+          <td class="border px-4 py-2">{{ h.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,70 @@
+<!-- {# ---------------------------------------------------------------
+    NAVBAR (desktop‑only)
+    Variabel  : role
+    Nilai role: "unknown", "pengunjung", "dokter hewan", "penjaga hewan",
+                "staf admin", "pelatih pertunjukan", "pengunjung_adopter"
+    --------------------------------------------------------------- #} -->
+ 
+ <nav class="bg-gray-100 dark:bg-gray-800 shadow-md px-8 py-4 flex justify-between items-center">
+ 
+   <!--  Brand / logo  -->
+   <a href="{% url 'auth_option' %}"
+      class="font-mono font-bold text-2xl bg-clip-text text-[#FFB845]">
+      Sistem Informasi Zoo Pintar
+   </a>
+ 
+   <!--  Menu  -->
+   <ul class="flex items-center gap-10">
+ 
+     {# ===================== GUEST ===================== #}
+     {% if role == "unknown" %}
+       <li><a href="{% url 'login' %}"    class="nav-link">Login</a></li>
+       <li><a href="{% url 'register' %}" class="nav-link">Registrasi</a></li>
+ 
+     {% else %}
+       {# ============== MENU UMUM LOGIN ================ #}
+       <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
+ 
+       {# ============== MENU SPESIFIK ROLE ============= #}
+       {% if role == "dokter hewan" %}
+         <li><a class="nav-link">Rekam Medis</a></li>
+
+ 
+       {% elif role == "penjaga hewan" %}
+         <li><a class="nav-link">Catatan Perawatan</a></li>
+ 
+       {% elif role == "staf admin" %}
+         <li><a class="nav-link">Kelola Pengunjung</a></li>
+         <li><a class="nav-link">Kelola Adopsi</a></li>
+         <li><a class="nav-link">Kelola Adopter</a></li>
+ 
+       {% elif role == "pelatih pertunjukan" %}
+         <li><a class="nav-link">Jadwal Pertunjukan</a></li>
+ 
+       {% elif role == "pengunjung" %}
+         <li><a class="nav-link">Info Kebun</a></li>
+ 
+       {% elif role == "pengunjung_adopter" %}
+         <li><a class="nav-link">Hewan Adopsi</a></li>
+       {% endif %}
+ 
+       {# ============== MENU UMUM SEMUA ROLE =========== #}
+       <li><a href="{% url 'profile' %}"               class="nav-link">Pengaturan Profil</a></li>
+       <li><a href="{% url 'logout' %}"                class="nav-btn">Logout</a></li>
+     {% endif %}
+   </ul>
+ </nav>
+ 
+ <style>
+   .nav-link{
+     @apply relative text-gray-800 dark:text-gray-200 font-semibold
+            hover:text-[#FFB845] transition
+            after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-full
+            after:bg-[#FFB845] after:scale-x-0 hover:after:scale-x-100
+            after:transition-transform after:duration-300;
+   }
+   .nav-btn{
+     @apply text-white font-bold px-3 py-1 rounded bg-[#FFB845] hover:bg-[#e6a133] transition;
+   }
+ </style>
+ 
