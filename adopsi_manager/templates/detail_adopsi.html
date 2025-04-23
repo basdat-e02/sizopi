@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block meta %}<title>Detail Adopsi</title>{% endblock meta %}
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-6">
+  <div class="relative w-full max-w-lg bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
+    <!-- Close Button -->
+    <a href="{% url 'view_adopsi' %}"
+       class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+      [Tutup]
+    </a>
+
+    <!-- Heading -->
+    <h1 class="text-xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">
+      DETAIL ADOPSI HEWAN
+    </h1>
+
+    <!-- Details Table -->
+    <table class="table-fixed w-full text-sm text-left text-gray-800 dark:text-gray-100 mb-6 border">
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2 font-semibold w-48">Nama Hewan</td>
+          <td class="border px-4 py-2">{{ adopsi.nama_hewan }}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2 font-semibold">Jenis Hewan</td>
+          <td class="border px-4 py-2">{{ adopsi.jenis }}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2 font-semibold">Adopter Saat Ini</td>
+          <td class="border px-4 py-2">{{ adopsi.adopter }}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2 font-semibold">Tanggal Mulai Adopsi</td>
+          <td class="border px-4 py-2">{{ adopsi.tgl_mulai }}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2 font-semibold">Tanggal Akhir Adopsi</td>
+          <td class="border px-4 py-2">{{ adopsi.tgl_berhenti }}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2 font-semibold">Nominal Kontribusi</td>
+          <td class="border px-4 py-2">Rp{{ adopsi.kontribusi|intcomma }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Update Status & Stop Form -->
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-6">
+        <label for="status_pembayaran"
+               class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Status Pembayaran
+        </label>
+        <select id="status_pembayaran" name="status_pembayaran"
+                class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600
+                       focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
+          <option value="tertunda"
+            {% if adopsi.status_pembayaran == 'tertunda' %}selected{% endif %}>
+            Tertunda
+          </option>
+          <option value="lunas"
+            {% if adopsi.status_pembayaran == 'lunas' %}selected{% endif %}>
+            Lunas
+          </option>
+        </select>
+      </div>
+      <div class="flex justify-between">
+        <button type="submit" name="action" value="save"
+                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold">
+          Simpan Status
+        </button>
+        <button type="submit" name="action" value="stop"
+                formaction="{% url 'stop_adopsi' adopsi.id %}" formmethod="post"
+                class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold">
+          Hentikan Adopsi
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}
