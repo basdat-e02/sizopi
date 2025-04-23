@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'satwa_habitat',
+    'adopsi_manager',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
