@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block meta %}<title>Detail Adopsi Satwa</title>{% endblock meta %}
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-md w-full p-6 relative">
+    <!-- Close button -->
+    <button onclick="history.back()"
+            class="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white text-2xl">
+      &times;
+    </button>
+
+    <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Informasi Hewan Adopsi</h1>
+
+    <!-- Photo -->
+    <img src="{{ adopsi.foto_url }}" alt="{{ adopsi.nama_hewan }}" class="w-full h-48 object-cover rounded mb-4">
+
+    <!-- Details -->
+    <ul class="mb-6 space-y-2 text-sm text-gray-700 dark:text-gray-300">
+      <li><strong>Nama Hewan:</strong> {{ adopsi.nama_hewan }}</li>
+      <li><strong>Jenis:</strong> {{ adopsi.jenis }}</li>
+      <li><strong>Habitat:</strong> {{ adopsi.habitat }}</li>
+      <li><strong>Tanggal Mulai Adopsi:</strong> {{ adopsi.tgl_mulai }}</li>
+      <li><strong>Tanggal Akhir Adopsi:</strong> {{ adopsi.tgl_berhenti }}</li>
+    </ul>
+
+    <!-- Action buttons -->
+    <div class="flex flex-wrap gap-3 mb-6">
+      <a href="{% url 'laporan_kondisi' adopsi.id %}"
+         class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold">
+        Pantau Kondisi Hewan
+      </a>
+      <a href="{% url 'certificate_adopsi' adopsi.id %}"
+         class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold">
+        Lihat Sertifikat Adopsi
+      </a>
+      <a href="{% url 'modal_berhenti_adopter' adopsi.id %}"
+         class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold">
+        Berhenti Adopsi
+      </a>
+      <!-- Perpanjang button starts disabled -->
+      <a id="extend-btn"
+         data-url="{% url 'extend_adopsi' adopsi.id %}"
+         class="px-4 py-2 bg-gray-600 text-white rounded-lg opacity-50 cursor-not-allowed">
+        Perpanjang Periode Adopsi
+      </a>
+    </div>
+
+    <!-- Choose type to enable “Perpanjang” -->
+    <fieldset class="space-y-2">
+      <legend class="font-semibold text-gray-800 dark:text-gray-200">Perpanjang sebagai:</legend>
+      <label class="inline-flex items-center">
+        <input type="radio" name="extend_type" value="individu"
+               class="form-radio text-blue-600 focus:ring-blue-500">
+        <span class="ml-2">Individu</span>
+      </label>
+      <label class="inline-flex items-center ml-6">
+        <input type="radio" name="extend_type" value="organisasi"
+               class="form-radio text-blue-600 focus:ring-blue-500">
+        <span class="ml-2">Organisasi</span>
+      </label>
+    </fieldset>
+  </div>
+</div>
+
+<!-- Inline script to enable “Perpanjang” once a radio is selected -->
+<script>
+  document.querySelectorAll('input[name="extend_type"]').forEach(radio => {
+    radio.addEventListener('change', event => {
+      const btn = document.getElementById('extend-btn');
+      // activate styles
+      btn.classList.remove('opacity-50','cursor-not-allowed');
+      btn.classList.add('opacity-100','cursor-pointer');
+      // set href to include chosen type
+      btn.setAttribute('href', btn.dataset.url + '?type=' + event.target.value);
+    });
+  });
+</script>
+{% endblock content %}

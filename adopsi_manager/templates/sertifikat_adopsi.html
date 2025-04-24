@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block meta %}<title>Sertifikat Adopsi Satwa</title>{% endblock meta %}
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
+  <div class="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center">
+    <h1 class="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Sertifikat Adopsi Satwa</h1>
+    <p class="mb-6 text-gray-700 dark:text-gray-300">
+      Sertifikat ini diberikan kepada<br>
+      <span class="font-semibold">{{ adopsi.adopter }}</span><br>
+      yang telah mengadopsi satwa<br>
+      <span class="font-semibold">{{ adopsi.jenis }} bernama {{ adopsi.nama_hewan }}</span><br>
+      di taman safari secara simbolis dari<br>
+      <span class="font-semibold">{{ adopsi.tgl_mulai }}</span> hingga 
+      <span class="font-semibold">{{ adopsi.tgl_berhenti }}</span>.
+    </p>
+    <a href="{% url 'detail_adopsi_adopter' adopsi.id %}"
+       class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold">
+      Kembali
+    </a>
+  </div>
+</div>
+{% endblock content %}
