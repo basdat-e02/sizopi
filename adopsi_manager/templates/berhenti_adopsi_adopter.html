@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block meta %}<title>Konfirmasi Berhenti Adopsi</title>{% endblock meta %}
+{% block content %}
+{% include "navbar.html" %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-6">
+  <div class="w-full max-w-sm bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg text-center">
+    <h1 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Konfirmasi Berhenti Adopsi</h1>
+    <p class="mb-6 dark:text-gray-200">
+      Apakah Anda yakin ingin berhenti mengadopsi satwa ini?
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="flex justify-center gap-4">
+        <button type="submit" name="confirm" value="yes"
+                formaction="{% url 'view_adopsi_adopter' %}"
+                class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold">
+          Iya
+        </button>
+        <button type="button" onclick="history.back()"
+                class="px-6 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg font-semibold">
+          Batal
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}
