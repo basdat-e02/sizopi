@@ -36,7 +36,12 @@
             <td class="border px-4 py-2">[foto {{ h.nama|lower }}]</td>
             <td class="border px-4 py-2 space-x-2">
               <a href="{% url 'edit_satwa' h.id %}" class="text-blue-500 hover:underline">[Edit]</a>
-              <a href="#" class="text-blue-500 hover:underline">[Hapus]</a>
+              <form action="{% url 'view_satwa' %}" method="POST" onsubmit="return confirm('Yakin ingin menghapus {{ h.nama }}?');" class="inline">
+                {% csrf_token %}
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" name="id" value="{{ h.id }}">
+                <button type="submit" class="text-red-500 hover:underline">[Hapus]</button>
+              </form>
             </td>
           </tr>
           {% endfor %}

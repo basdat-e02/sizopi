@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta %}
+  <title>Message</title>
+{% endblock meta %}
+
+{% block content %}
+
+  <div class="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div class="w-full max-w-md p-6 space-y-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-{{ color }}-400">
+      <div class="flex items-center justify-center">
+        <svg class="w-8 h-8 text-{{ color }}-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2l4 -4M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10z" />
+        </svg>
+        <h2 class="text-xl font-bold text-{{ color }}-700 dark:text-{{ color }}-300">{{ text }}</h2>
+      </div>
+
+      <p class="text-center text-gray-800 dark:text-gray-200 font-medium break-words">{{ message }}</p>
+
+      <div class="text-center">
+        <button onclick="history.back()"
+                class="mt-4 px-4 py-2 font-semibold text-white bg-{{ color }}-600 hover:bg-{{ color }}-700 rounded-lg">
+          Kembali
+        </button>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}

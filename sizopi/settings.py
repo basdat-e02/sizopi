@@ -9,12 +9,13 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+from dotenv import load_dotenv
 from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+SQL_DIR = os.path.join(BASE_DIR, 'sql')
 
 
 # Quick-start development settings - unsuitable for production
@@ -32,26 +33,29 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", '10.0.2.2', ]
 # Application definition
 
 INSTALLED_APPS = [
+    # django things
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+    # apps
+    'sizopi',
     'main',
     'satwa_habitat',
     'adopsi_manager',
-    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware', #
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware', #
+    'django.contrib.messages.middleware.MessageMiddleware', #
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
@@ -82,13 +86,47 @@ WSGI_APPLICATION = 'sizopi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
+# use supabase if .env is there
+try:
+    load_dotenv()
+
+    USER = os.getenv("user")
+    PASSWORD = os.getenv("password")
+    HOST = os.getenv("host")
+    PORT = os.getenv("port")
+    DBNAME = os.getenv("dbname")
+
+    if USER and PASSWORD and HOST and PORT and DBNAME:
+        default_db = {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': DBNAME,
+            'USER': USER,
+            'PASSWORD': PASSWORD,
+            'HOST': HOST,
+            'PORT': PORT,
+        }
+    else:
+        raise Exception("Missing DB env vars")
+
+except Exception as e:
+    print(f"⚠️ Using SQLite fallback: {e}")
+    default_db = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+
+DATABASES = {
+    'default': default_db
 }
 
+# Deactivate migration command
+class DisableMigrations:
+    def __contains__(self, item):
+        return True
+    def __getitem__(self, item):
+        return None
+
+MIGRATION_MODULES = DisableMigrations()
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
