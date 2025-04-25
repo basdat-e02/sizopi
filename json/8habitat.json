@@ -1,0 +1,51 @@
+[
+    {
+      "nama": "Savanna",
+      "luas_area": "600",
+      "kapasitas": 5,
+      "status": "Tersedia"
+    },
+    {
+      "nama": "Hutan Hujan",
+      "luas_area": "700",
+      "kapasitas": 10,
+      "status": "Tersedia"
+    },
+    {
+      "nama": "Gurun",
+      "luas_area": "800",
+      "kapasitas": 15,
+      "status": "Penuh"
+    },
+    {
+      "nama": "Rawa",
+      "luas_area": "900",
+      "kapasitas": 20,
+      "status": "Tersedia"
+    },
+    {
+      "nama": "Tundra",
+      "luas_area": "1000",
+      "kapasitas": 25,
+      "status": "Tersedia"
+    },
+    {
+      "nama": "Terumbu Karang",
+      "luas_area": "1100",
+      "kapasitas": 30,
+      "status": "Penuh"
+    },
+    {
+      "nama": "Pegunungan",
+      "luas_area": "1200",
+      "kapasitas": 35,
+      "status": "Tersedia"
+    },
+    {
+      "nama": "Padang Rumput",
+      "luas_area": "1300",
+      "kapasitas": 40,
+      "status": "Tersedia"
+    }
+  ]
+  

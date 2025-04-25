@@ -106,6 +106,25 @@ def change_password(request):
     }
     return render(request, 'change_password.html', context)
 
+# HOW TO USE
+# return redirect(f'/show_message/?msg={message}&type=warning')
+def show_message(request):
+    type = request.GET.get("type", "info")
+    msg = request.GET.get("msg", "")
+
+    colors = {
+        "success": ("green", "Berhasil"),
+        "error": ("red", "Gagal"),
+        "warning": ("yellow", "Peringatan"),
+    }
+    color, text = colors.get(type, ("gray", "Pesan"))
+
+    return render(request, "show_message.html", {
+        "message": msg,
+        "color": color,
+        "text": text
+    })
+
 
 ######################################################
 ##################### PBP ############################

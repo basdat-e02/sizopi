@@ -1,0 +1,68 @@
+[
+    {
+      "nama": "Safari Singa Liar",
+      "jadwal": "2023-03-01 10:00:00",
+      "kapasitas_max": 50
+    },
+    {
+      "nama": "Akrobat Lumba-lumba",
+      "jadwal": "2023-03-01 11:00:00",
+      "kapasitas_max": 100
+    },
+    {
+      "nama": "Penerbangan Elang",
+      "jadwal": "2023-03-01 12:00:00",
+      "kapasitas_max": 150
+    },
+    {
+      "nama": "Parade Gajah Asia",
+      "jadwal": "2023-03-01 13:00:00",
+      "kapasitas_max": 200
+    },
+    {
+      "nama": "Teater Primata Cerdas",
+      "jadwal": "2023-03-01 14:00:00",
+      "kapasitas_max": 250
+    },
+    {
+      "nama": "Momen Penguin Kutub",
+      "jadwal": "2023-03-01 15:00:00",
+      "kapasitas_max": 300
+    },
+    {
+      "nama": "Eksibisi Reptil Langka",
+      "jadwal": "2023-03-01 16:00:00",
+      "kapasitas_max": 350
+    },
+    {
+      "nama": "Aksi Anjing Laut",
+      "jadwal": "2023-03-01 17:00:00",
+      "kapasitas_max": 400
+    },
+    {
+      "nama": "Roller Coaster Safari",
+      "jadwal": "2023-03-01 18:00:00",
+      "kapasitas_max": 60
+    },
+    {
+      "nama": "Gua Kelelawar",
+      "jadwal": "2023-03-01 19:00:00",
+      "kapasitas_max": 120
+    },
+    {
+      "nama": "Perahu Danau",
+      "jadwal": "2023-03-01 20:00:00",
+      "kapasitas_max": 180
+    },
+    {
+      "nama": "Kereta Satwa",
+      "jadwal": "2023-03-01 21:00:00",
+      "kapasitas_max": 240
+    },
+    {
+      "nama": "Taman Bermain Anak",
+      "jadwal": "2023-03-01 22:00:00",
+      "kapasitas_max": 300
+    }
+  ]
+  
