@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'main',
     'satwa_habitat',
     'adopsi_manager',
+    'django.contrib.humanize',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -164,13 +166,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATIC_URL = '/static/'
 if DEBUG:
     STATICFILES_DIRS = [
         BASE_DIR / 'static' # merujuk ke /static root project pada mode development
     ]
 else:
-    STATIC_ROOT = BASE_DIR / 'static' # merujuk ke /static root project pada mode production
+    STATIC_ROOT = BASE_DIR / 'staticfiles' # merujuk ke /static root project pada mode production
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
