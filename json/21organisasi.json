@@ -1,0 +1,53 @@
+[
+    {
+      "npp": "12340001",
+      "nama_organisasi": "Organisasi 1",
+      "id_adopter": "c175f585-86bc-4d47-8130-52c42591fad1"
+    },
+    {
+      "npp": "12340002",
+      "nama_organisasi": "Organisasi 2",
+      "id_adopter": "d6624c5b-d18a-4215-a941-3be166317dfa"
+    },
+    {
+      "npp": "12340003",
+      "nama_organisasi": "Organisasi 3",
+      "id_adopter": "d6b5633c-f0a6-4710-8b5d-0b2cc29fb2fe"
+    },
+    {
+      "npp": "12340004",
+      "nama_organisasi": "Organisasi 4",
+      "id_adopter": "d9aeaaa4-e486-4bf7-b177-e97a1ff6a332"
+    },
+    {
+      "npp": "12340005",
+      "nama_organisasi": "Organisasi 5",
+      "id_adopter": "ed6d1454-20c8-48bb-bf8b-fb56f6096b1a"
+    },
+    {
+      "npp": "12340006",
+      "nama_organisasi": "Organisasi 6",
+      "id_adopter": "edd640f9-8e64-4988-aa86-cc4e11c8f8eb"
+    },
+    {
+      "npp": "12340007",
+      "nama_organisasi": "Organisasi 7",
+      "id_adopter": "f102ce15-189b-4424-a39f-7412f1a89e0c"
+    },
+    {
+      "npp": "12340008",
+      "nama_organisasi": "Organisasi 8",
+      "id_adopter": "f343e422-2be0-41e3-9148-958100680e51"
+    },
+    {
+      "npp": "12340009",
+      "nama_organisasi": "Organisasi 9",
+      "id_adopter": "f762efa3-02ae-4607-985a-09389822eaab"
+    },
+    {
+      "npp": "12340010",
+      "nama_organisasi": "Organisasi 10",
+      "id_adopter": "fc5e862a-895f-44a0-9337-2db78735549e"
+    }
+  ]
+  

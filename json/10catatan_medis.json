@@ -1,0 +1,93 @@
+[
+    {
+      "id_hewan": "055df7d4-9239-46f8-9a10-d84ee67303cb",
+      "username_dh": "user51",
+      "tanggal_pemeriksaan": "2023-01-16",
+      "diagnosis": "Diagnosis 1",
+      "pengobatan": "Pengobatan 1",
+      "status_kesehatan": "Stabil",
+      "catatan_tindak_lanjut": "Catatan 1"
+    },
+    {
+      "id_hewan": "0af43318-6b72-4163-b26a-9495eee901ff",
+      "username_dh": "user52",
+      "tanggal_pemeriksaan": "2023-01-31",
+      "diagnosis": "Diagnosis 2",
+      "pengobatan": "Pengobatan 2",
+      "status_kesehatan": "Perlu Pengawasan",
+      "catatan_tindak_lanjut": "Catatan 2"
+    },
+    {
+      "id_hewan": "15f45166-175a-426d-bbdb-e87ec8d29120",
+      "username_dh": "user53",
+      "tanggal_pemeriksaan": "2023-02-15",
+      "diagnosis": "Diagnosis 3",
+      "pengobatan": "Pengobatan 3",
+      "status_kesehatan": "Membaik",
+      "catatan_tindak_lanjut": "Catatan 3"
+    },
+    {
+      "id_hewan": "168bbbd3-842d-4650-a48c-7e3e6b5ebb34",
+      "username_dh": "user54",
+      "tanggal_pemeriksaan": "2023-03-02",
+      "diagnosis": "Diagnosis 4",
+      "pengobatan": "Pengobatan 4",
+      "status_kesehatan": "Stabil",
+      "catatan_tindak_lanjut": "Catatan 4"
+    },
+    {
+      "id_hewan": "22f5ab5c-0dc8-461d-bbd3-55ee68976d56",
+      "username_dh": "user55",
+      "tanggal_pemeriksaan": "2023-03-17",
+      "diagnosis": "Diagnosis 5",
+      "pengobatan": "Pengobatan 5",
+      "status_kesehatan": "Perlu Pengawasan",
+      "catatan_tindak_lanjut": "Catatan 5"
+    },
+    {
+      "id_hewan": "26b823c1-4bc4-44b7-afce-fa7c9e5eb2fc",
+      "username_dh": "user56",
+      "tanggal_pemeriksaan": "2023-04-01",
+      "diagnosis": "Diagnosis 6",
+      "pengobatan": "Pengobatan 6",
+      "status_kesehatan": "Membaik",
+      "catatan_tindak_lanjut": "Catatan 6"
+    },
+    {
+      "id_hewan": "33c9fb51-70a7-4154-9bbc-058eb6d53947",
+      "username_dh": "user57",
+      "tanggal_pemeriksaan": "2023-04-16",
+      "diagnosis": "Diagnosis 7",
+      "pengobatan": "Pengobatan 7",
+      "status_kesehatan": "Stabil",
+      "catatan_tindak_lanjut": "Catatan 7"
+    },
+    {
+      "id_hewan": "379e472c-e7f4-4dcd-9d58-04a39bf919e5",
+      "username_dh": "user58",
+      "tanggal_pemeriksaan": "2023-05-01",
+      "diagnosis": "Diagnosis 8",
+      "pengobatan": "Pengobatan 8",
+      "status_kesehatan": "Perlu Pengawasan",
+      "catatan_tindak_lanjut": "Catatan 8"
+    },
+    {
+      "id_hewan": "41c132a8-d31d-4529-a191-f4a5cc039820",
+      "username_dh": "user59",
+      "tanggal_pemeriksaan": "2023-05-16",
+      "diagnosis": "Diagnosis 9",
+      "pengobatan": "Pengobatan 9",
+      "status_kesehatan": "Membaik",
+      "catatan_tindak_lanjut": "Catatan 9"
+    },
+    {
+      "id_hewan": "42956600-9a1b-42cf-b694-e0e9925ed8d5",
+      "username_dh": "user60",
+      "tanggal_pemeriksaan": "2023-05-31",
+      "diagnosis": "Diagnosis 10",
+      "pengobatan": "Pengobatan 10",
+      "status_kesehatan": "Stabil",
+      "catatan_tindak_lanjut": "Catatan 10"
+    }
+  ]
+  

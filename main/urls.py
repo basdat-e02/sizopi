@@ -13,4 +13,6 @@ urlpatterns = [
     path('dashboard', dashboard, name='dashboard'),
     path('profile', profile, name='profile'),
     path('change-password', change_password, name='change_password'),
+    path('show_message/', show_message, name='show_message')
+
 ]

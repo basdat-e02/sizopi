@@ -1,0 +1,197 @@
+-- HABITAT Table CRUD Operations
+
+-- CREATE (Insert) Operation for HABITAT
+CREATE OR REPLACE FUNCTION insert_habitat(
+    p_nama VARCHAR(50),
+    p_luas_area DECIMAL,
+    p_kapasitas INT,
+    p_status VARCHAR(100)
+) RETURNS VOID AS $$
+BEGIN
+    INSERT INTO HABITAT (nama, luas_area, kapasitas, status)
+    VALUES (p_nama, p_luas_area, p_kapasitas, p_status);
+END;
+$$ LANGUAGE plpgsql;
+
+-- READ Operations for HABITAT
+CREATE OR REPLACE FUNCTION get_all_habitats() 
+RETURNS TABLE (
+    nama VARCHAR(50),
+    luas_area DECIMAL,
+    kapasitas INT,
+    status VARCHAR(100)
+) AS $$
+BEGIN
+    RETURN QUERY SELECT h.nama, h.luas_area, h.kapasitas, h.status FROM HABITAT h;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_habitat_by_name(p_nama VARCHAR(50))
+RETURNS TABLE (
+    nama VARCHAR(50),
+    luas_area DECIMAL,
+    kapasitas INT,
+    status VARCHAR(100)
+) AS $$
+BEGIN
+    RETURN QUERY SELECT h.nama, h.luas_area, h.kapasitas, h.status 
+    FROM HABITAT h
+    WHERE h.nama = p_nama;
+END;
+$$ LANGUAGE plpgsql;
+
+-- UPDATE Operation for HABITAT
+CREATE OR REPLACE FUNCTION update_habitat(
+    p_nama VARCHAR(50),
+    p_luas_area DECIMAL,
+    p_kapasitas INT,
+    p_status VARCHAR(100)
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE HABITAT
+    SET luas_area = p_luas_area,
+        kapasitas = p_kapasitas,
+        status = p_status
+    WHERE nama = p_nama;
+END;
+$$ LANGUAGE plpgsql;
+
+-- DELETE Operation for HABITAT
+CREATE OR REPLACE FUNCTION delete_habitat(p_nama VARCHAR(50))
+RETURNS VOID AS $$
+BEGIN
+    DELETE FROM HABITAT WHERE nama = p_nama;
+END;
+$$ LANGUAGE plpgsql;
+
+-- HEWAN Table CRUD Operations
+
+-- CREATE (Insert) Operation for HEWAN
+CREATE OR REPLACE FUNCTION insert_hewan(
+    p_nama VARCHAR(100),
+    p_spesies VARCHAR(100),
+    p_asal_hewan VARCHAR(100),
+    p_tanggal_lahir DATE,
+    p_status_kesehatan VARCHAR(50),
+    p_nama_habitat VARCHAR(50),
+    p_url_foto VARCHAR(255)
+) RETURNS UUID AS $$
+DECLARE
+    new_id UUID := gen_random_uuid();
+BEGIN
+    INSERT INTO HEWAN (id, nama, spesies, asal_hewan, tanggal_lahir, status_kesehatan, nama_habitat, url_foto)
+    VALUES (new_id, p_nama, p_spesies, p_asal_hewan, p_tanggal_lahir, p_status_kesehatan, p_nama_habitat, p_url_foto);
+    
+    RETURN new_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- READ Operations for HEWAN
+CREATE OR REPLACE FUNCTION get_all_hewan()
+RETURNS TABLE (
+    id UUID,
+    nama VARCHAR(100),
+    spesies VARCHAR(100),
+    asal_hewan VARCHAR(100),
+    tanggal_lahir DATE,
+    status_kesehatan VARCHAR(50),
+    nama_habitat VARCHAR(50),
+    url_foto VARCHAR(255)
+) AS $$
+BEGIN
+    RETURN QUERY SELECT h.id, h.nama, h.spesies, h.asal_hewan, h.tanggal_lahir, h.status_kesehatan, h.nama_habitat, h.url_foto
+    FROM HEWAN h;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_hewan_by_id(p_id UUID)
+RETURNS TABLE (
+    id UUID,
+    nama VARCHAR(100),
+    spesies VARCHAR(100),
+    asal_hewan VARCHAR(100),
+    tanggal_lahir DATE,
+    status_kesehatan VARCHAR(50),
+    nama_habitat VARCHAR(50),
+    url_foto VARCHAR(255)
+) AS $$
+BEGIN
+    RETURN QUERY SELECT h.id, h.nama, h.spesies, h.asal_hewan, h.tanggal_lahir, h.status_kesehatan, h.nama_habitat, h.url_foto
+    FROM HEWAN h
+    WHERE h.id = p_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_hewan_by_habitat(p_nama_habitat VARCHAR(50))
+RETURNS TABLE (
+    id UUID,
+    nama VARCHAR(100),
+    spesies VARCHAR(100),
+    asal_hewan VARCHAR(100),
+    tanggal_lahir DATE,
+    status_kesehatan VARCHAR(50),
+    nama_habitat VARCHAR(50),
+    url_foto VARCHAR(255)
+) AS $$
+BEGIN
+    RETURN QUERY SELECT h.id, h.nama, h.spesies, h.asal_hewan, h.tanggal_lahir, h.status_kesehatan, h.nama_habitat, h.url_foto
+    FROM HEWAN h
+    WHERE h.nama_habitat = p_nama_habitat;
+END;
+$$ LANGUAGE plpgsql;
+
+-- UPDATE Operation for HEWAN
+CREATE OR REPLACE FUNCTION update_hewan(
+    p_id UUID,
+    p_nama VARCHAR(100),
+    p_spesies VARCHAR(100),
+    p_asal_hewan VARCHAR(100),
+    p_tanggal_lahir DATE,
+    p_status_kesehatan VARCHAR(50),
+    p_nama_habitat VARCHAR(50),
+    p_url_foto VARCHAR(255)
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE HEWAN
+    SET nama = p_nama,
+        spesies = p_spesies,
+        asal_hewan = p_asal_hewan,
+        tanggal_lahir = p_tanggal_lahir,
+        status_kesehatan = p_status_kesehatan,
+        nama_habitat = p_nama_habitat,
+        url_foto = p_url_foto
+    WHERE id = p_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- UPDATE specific field: Status Kesehatan
+CREATE OR REPLACE FUNCTION update_hewan_kesehatan(
+    p_id UUID,
+    p_status_kesehatan VARCHAR(50)
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE HEWAN
+    SET status_kesehatan = p_status_kesehatan
+    WHERE id = p_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- UPDATE specific field: Habitat
+CREATE OR REPLACE FUNCTION update_hewan_habitat(
+    p_id UUID,
+    p_nama_habitat VARCHAR(50)
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE HEWAN
+    SET nama_habitat = p_nama_habitat
+    WHERE id = p_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- DELETE Operation for HEWAN
+CREATE OR REPLACE FUNCTION delete_hewan(p_id UUID)
+RETURNS VOID AS $$
+BEGIN
+    DELETE FROM HEWAN WHERE id = p_id;
+END;
+$$ LANGUAGE plpgsql;

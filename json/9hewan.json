@@ -1,0 +1,402 @@
+[
+    {
+      "id": "26b823c1-4bc4-44b7-afce-fa7c9e5eb2fc",
+      "nama": "Hewan1",
+      "spesies": "Gajah",
+      "asal_hewan": "Asia",
+      "tanggal_lahir": "2015-01-31",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Hutan Hujan",
+      "url_foto": "https://example.com/animal/1.jpg"
+    },
+    {
+      "id": "8825f4f1-9bc5-4c6c-91b4-eb6004624206",
+      "nama": "Hewan2",
+      "spesies": "Jerapah",
+      "asal_hewan": "Amerika",
+      "tanggal_lahir": "2015-03-02",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Padang Rumput",
+      "url_foto": "https://example.com/animal/2.jpg"
+    },
+    {
+      "id": "ae54c27b-4ad5-48e3-8ffc-9f2eb0b824ac",
+      "nama": "Hewan3",
+      "spesies": "Harimau",
+      "asal_hewan": "Australia",
+      "tanggal_lahir": "2015-04-01",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Pegunungan",
+      "url_foto": "https://example.com/animal/3.jpg"
+    },
+    {
+      "id": "4b554c24-7d78-4481-a182-3787666a1ebc",
+      "nama": "Hewan4",
+      "spesies": "Buaya",
+      "asal_hewan": "Eropa",
+      "tanggal_lahir": "2015-05-01",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Rawa",
+      "url_foto": "https://example.com/animal/4.jpg"
+    },
+    {
+      "id": "722fa19d-f5f1-4156-ac2a-d3372f8c487b",
+      "nama": "Hewan5",
+      "spesies": "Burung Elang",
+      "asal_hewan": "Afrika",
+      "tanggal_lahir": "2015-05-31",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Savanna",
+      "url_foto": "https://example.com/animal/5.jpg"
+    },
+    {
+      "id": "435ddb68-251d-424f-84c5-99f6af1fda95",
+      "nama": "Hewan6",
+      "spesies": "Kodok",
+      "asal_hewan": "Asia",
+      "tanggal_lahir": "2015-06-30",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Terumbu Karang",
+      "url_foto": "https://example.com/animal/6.jpg"
+    },
+    {
+      "id": "41c132a8-d31d-4529-a191-f4a5cc039820",
+      "nama": "Hewan7",
+      "spesies": "Ikan Hiu",
+      "asal_hewan": "Amerika",
+      "tanggal_lahir": "2015-07-30",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Tundra",
+      "url_foto": "https://example.com/animal/7.jpg"
+    },
+    {
+      "id": "e0da4a64-a995-4293-8197-f17a1b426d75",
+      "nama": "Hewan8",
+      "spesies": "Singa",
+      "asal_hewan": "Australia",
+      "tanggal_lahir": "2015-08-29",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Gurun",
+      "url_foto": "https://example.com/animal/8.jpg"
+    },
+    {
+      "id": "168bbbd3-842d-4650-a48c-7e3e6b5ebb34",
+      "nama": "Hewan9",
+      "spesies": "Gajah",
+      "asal_hewan": "Eropa",
+      "tanggal_lahir": "2015-09-28",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Hutan Hujan",
+      "url_foto": "https://example.com/animal/9.jpg"
+    },
+    {
+      "id": "a2ab5846-66ad-4575-bf64-17cd4cccb29f",
+      "nama": "Hewan10",
+      "spesies": "Jerapah",
+      "asal_hewan": "Afrika",
+      "tanggal_lahir": "2015-10-28",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Padang Rumput",
+      "url_foto": "https://example.com/animal/10.jpg"
+    },
+    {
+      "id": "15f45166-175a-426d-bbdb-e87ec8d29120",
+      "nama": "Hewan11",
+      "spesies": "Harimau",
+      "asal_hewan": "Asia",
+      "tanggal_lahir": "2015-11-27",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Pegunungan",
+      "url_foto": "https://example.com/animal/11.jpg"
+    },
+    {
+      "id": "936506cc-b859-4264-be9d-ddc1d75f5d96",
+      "nama": "Hewan12",
+      "spesies": "Buaya",
+      "asal_hewan": "Amerika",
+      "tanggal_lahir": "2015-12-27",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Rawa",
+      "url_foto": "https://example.com/animal/12.jpg"
+    },
+    {
+      "id": "c7c5b07d-f883-4f3e-a0a3-ba09fdab040b",
+      "nama": "Hewan13",
+      "spesies": "Burung Elang",
+      "asal_hewan": "Australia",
+      "tanggal_lahir": "2016-01-26",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Savanna",
+      "url_foto": "https://example.com/animal/13.jpg"
+    },
+    {
+      "id": "d89f4edc-6596-4e96-adaf-4f7cf9052a1f",
+      "nama": "Hewan14",
+      "spesies": "Kodok",
+      "asal_hewan": "Eropa",
+      "tanggal_lahir": "2016-02-25",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Terumbu Karang",
+      "url_foto": "https://example.com/animal/14.jpg"
+    },
+    {
+      "id": "0af43318-6b72-4163-b26a-9495eee901ff",
+      "nama": "Hewan15",
+      "spesies": "Ikan Hiu",
+      "asal_hewan": "Afrika",
+      "tanggal_lahir": "2016-03-26",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Tundra",
+      "url_foto": "https://example.com/animal/15.jpg"
+    },
+    {
+      "id": "5523ea62-cfe0-45f3-9b36-3cd5f0154a3d",
+      "nama": "Hewan16",
+      "spesies": "Singa",
+      "asal_hewan": "Asia",
+      "tanggal_lahir": "2016-04-25",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Gurun",
+      "url_foto": "https://example.com/animal/16.jpg"
+    },
+    {
+      "id": "e3e600fd-6e12-4605-a461-ec52edc3b8ac",
+      "nama": "Hewan17",
+      "spesies": "Gajah",
+      "asal_hewan": "Amerika",
+      "tanggal_lahir": "2016-05-25",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Hutan Hujan",
+      "url_foto": "https://example.com/animal/17.jpg"
+    },
+    {
+      "id": "a1f190e2-9765-47fd-8959-d63bded00bdd",
+      "nama": "Hewan18",
+      "spesies": "Jerapah",
+      "asal_hewan": "Australia",
+      "tanggal_lahir": "2016-06-24",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Padang Rumput",
+      "url_foto": "https://example.com/animal/18.jpg"
+    },
+    {
+      "id": "7d5317fe-ca7a-4639-b27c-618b0a921b28",
+      "nama": "Hewan19",
+      "spesies": "Harimau",
+      "asal_hewan": "Eropa",
+      "tanggal_lahir": "2016-07-24",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Pegunungan",
+      "url_foto": "https://example.com/animal/19.jpg"
+    },
+    {
+      "id": "7c0c8348-93dd-4c89-a3b0-544f710ac81b",
+      "nama": "Hewan20",
+      "spesies": "Buaya",
+      "asal_hewan": "Afrika",
+      "tanggal_lahir": "2016-08-23",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Rawa",
+      "url_foto": "https://example.com/animal/20.jpg"
+    },
+    {
+      "id": "5a760fe1-f033-411c-84fd-e4cc0c001940",
+      "nama": "Hewan21",
+      "spesies": "Burung Elang",
+      "asal_hewan": "Asia",
+      "tanggal_lahir": "2016-09-22",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Savanna",
+      "url_foto": "https://example.com/animal/21.jpg"
+    },
+    {
+      "id": "d7d71cb9-199c-4a5d-bd12-96a0200a2bcd",
+      "nama": "Hewan22",
+      "spesies": "Kodok",
+      "asal_hewan": "Amerika",
+      "tanggal_lahir": "2016-10-22",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Terumbu Karang",
+      "url_foto": "https://example.com/animal/22.jpg"
+    },
+    {
+      "id": "b4d43e52-0879-498c-94b0-da2c727058ae",
+      "nama": "Hewan23",
+      "spesies": "Ikan Hiu",
+      "asal_hewan": "Australia",
+      "tanggal_lahir": "2016-11-21",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Tundra",
+      "url_foto": "https://example.com/animal/23.jpg"
+    },
+    {
+      "id": "33c9fb51-70a7-4154-9bbc-058eb6d53947",
+      "nama": "Hewan24",
+      "spesies": "Singa",
+      "asal_hewan": "Eropa",
+      "tanggal_lahir": "2016-12-21",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Gurun",
+      "url_foto": "https://example.com/animal/24.jpg"
+    },
+    {
+      "id": "e54fec4c-fd55-4c35-be6a-29f8f55afb92",
+      "nama": "Hewan25",
+      "spesies": "Gajah",
+      "asal_hewan": "Afrika",
+      "tanggal_lahir": "2017-01-20",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Hutan Hujan",
+      "url_foto": "https://example.com/animal/25.jpg"
+    },
+    {
+      "id": "22f5ab5c-0dc8-461d-bbd3-55ee68976d56",
+      "nama": "Hewan26",
+      "spesies": "Jerapah",
+      "asal_hewan": "Asia",
+      "tanggal_lahir": "2017-02-19",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Padang Rumput",
+      "url_foto": "https://example.com/animal/26.jpg"
+    },
+    {
+      "id": "379e472c-e7f4-4dcd-9d58-04a39bf919e5",
+      "nama": "Hewan27",
+      "spesies": "Harimau",
+      "asal_hewan": "Amerika",
+      "tanggal_lahir": "2017-03-21",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Pegunungan",
+      "url_foto": "https://example.com/animal/27.jpg"
+    },
+    {
+      "id": "f0df4fd4-87b5-47db-bc2d-29c0f9f44ce3",
+      "nama": "Hewan28",
+      "spesies": "Buaya",
+      "asal_hewan": "Australia",
+      "tanggal_lahir": "2017-04-20",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Rawa",
+      "url_foto": "https://example.com/animal/28.jpg"
+    },
+    {
+      "id": "42956600-9a1b-42cf-b694-e0e9925ed8d5",
+      "nama": "Hewan29",
+      "spesies": "Burung Elang",
+      "asal_hewan": "Eropa",
+      "tanggal_lahir": "2017-05-20",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Savanna",
+      "url_foto": "https://example.com/animal/29.jpg"
+    },
+    {
+      "id": "d15bcbde-315e-40cc-824a-8a2f63369e2b",
+      "nama": "Hewan30",
+      "spesies": "Kodok",
+      "asal_hewan": "Afrika",
+      "tanggal_lahir": "2017-06-19",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Terumbu Karang",
+      "url_foto": "https://example.com/animal/30.jpg"
+    },
+    {
+      "id": "eece0d4c-0c2c-46ed-b63d-9e1bafe0986d",
+      "nama": "Hewan31",
+      "spesies": "Ikan Hiu",
+      "asal_hewan": "Asia",
+      "tanggal_lahir": "2017-07-19",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Tundra",
+      "url_foto": "https://example.com/animal/31.jpg"
+    },
+    {
+      "id": "c1d56dfe-abdc-44a2-bf30-8b3e4e8916d8",
+      "nama": "Hewan32",
+      "spesies": "Singa",
+      "asal_hewan": "Amerika",
+      "tanggal_lahir": "2017-08-18",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Gurun",
+      "url_foto": "https://example.com/animal/32.jpg"
+    },
+    {
+      "id": "60db1197-0105-4006-99d6-d0c3cb07d21b",
+      "nama": "Hewan33",
+      "spesies": "Gajah",
+      "asal_hewan": "Australia",
+      "tanggal_lahir": "2017-09-17",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Hutan Hujan",
+      "url_foto": "https://example.com/animal/33.jpg"
+    },
+    {
+      "id": "6b65296a-ac38-479c-a145-f7c42c5d1155",
+      "nama": "Hewan34",
+      "spesies": "Jerapah",
+      "asal_hewan": "Eropa",
+      "tanggal_lahir": "2017-10-17",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Padang Rumput",
+      "url_foto": "https://example.com/animal/34.jpg"
+    },
+    {
+      "id": "bbd125b6-1f9b-42ef-8868-b65cdf11a4cd",
+      "nama": "Hewan35",
+      "spesies": "Harimau",
+      "asal_hewan": "Afrika",
+      "tanggal_lahir": "2017-11-16",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Pegunungan",
+      "url_foto": "https://example.com/animal/35.jpg"
+    },
+    {
+      "id": "b49e6473-9709-41f0-ab8b-ddad350c5e3e",
+      "nama": "Hewan36",
+      "spesies": "Buaya",
+      "asal_hewan": "Asia",
+      "tanggal_lahir": "2017-12-16",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Rawa",
+      "url_foto": "https://example.com/animal/36.jpg"
+    },
+    {
+      "id": "a58f451f-f832-47ba-92e2-98e98a8f339b",
+      "nama": "Hewan37",
+      "spesies": "Burung Elang",
+      "asal_hewan": "Amerika",
+      "tanggal_lahir": "2018-01-15",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Savanna",
+      "url_foto": "https://example.com/animal/37.jpg"
+    },
+    {
+      "id": "c3baf294-c3dd-467c-a972-df9409d37882",
+      "nama": "Hewan38",
+      "spesies": "Kodok",
+      "asal_hewan": "Australia",
+      "tanggal_lahir": "2018-02-14",
+      "status_kesehatan": "Dalam Pemantauan",
+      "nama_habitat": "Terumbu Karang",
+      "url_foto": "https://example.com/animal/38.jpg"
+    },
+    {
+      "id": "055df7d4-9239-46f8-9a10-d84ee67303cb",
+      "nama": "Hewan39",
+      "spesies": "Ikan Hiu",
+      "asal_hewan": "Eropa",
+      "tanggal_lahir": "2018-03-16",
+      "status_kesehatan": "Sehat",
+      "nama_habitat": "Tundra",
+      "url_foto": "https://example.com/animal/39.jpg"
+    },
+    {
+      "id": "7a2487e0-3c3a-4aaf-96c2-92333c72ffe8",
+      "nama": "Hewan40",
+      "spesies": "Singa",
+      "asal_hewan": "Afrika",
+      "tanggal_lahir": "2018-04-15",
+      "status_kesehatan": "Sakit",
+      "nama_habitat": "Gurun",
+      "url_foto": "https://example.com/animal/40.jpg"
+    }
+  ]

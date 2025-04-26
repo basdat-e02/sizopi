@@ -1,0 +1,242 @@
+[
+    {
+      "id_adopter": "00ef59f4-e236-406f-8139-6d864cbfadb4",
+      "id_hewan": "055df7d4-9239-46f8-9a10-d84ee67303cb",
+      "status_pembayaran": "Cicilan",
+      "tgl_mulai_adopsi": "2023-01-06",
+      "tgl_berhenti_adopsi": "2024-01-06",
+      "kontribusi_finansial": 100000
+    },
+    {
+      "id_adopter": "03a65731-e0cd-4f79-86e5-074ce4229bc9",
+      "id_hewan": "0af43318-6b72-4163-b26a-9495eee901ff",
+      "status_pembayaran": "Pending",
+      "tgl_mulai_adopsi": "2023-01-11",
+      "tgl_berhenti_adopsi": "2024-01-11",
+      "kontribusi_finansial": 200000
+    },
+    {
+      "id_adopter": "068cad0c-2799-4bed-9f40-be07243465bb",
+      "id_hewan": "15f45166-175a-426d-bbdb-e87ec8d29120",
+      "status_pembayaran": "Lunas",
+      "tgl_mulai_adopsi": "2023-01-16",
+      "tgl_berhenti_adopsi": "2024-01-16",
+      "kontribusi_finansial": 300000
+    },
+    {
+      "id_adopter": "0b7ff90d-6328-4d27-af96-7de622f4d265",
+      "id_hewan": "168bbbd3-842d-4650-a48c-7e3e6b5ebb34",
+      "status_pembayaran": "Cicilan",
+      "tgl_mulai_adopsi": "2023-01-21",
+      "tgl_berhenti_adopsi": "2024-01-21",
+      "kontribusi_finansial": 400000
+    },
+    {
+      "id_adopter": "177af5ed-0fef-406a-9846-7b87d15071ea",
+      "id_hewan": "22f5ab5c-0dc8-461d-bbd3-55ee68976d56",
+      "status_pembayaran": "Pending",
+      "tgl_mulai_adopsi": "2023-01-26",
+      "tgl_berhenti_adopsi": "2024-01-26",
+      "kontribusi_finansial": 500000
+    },
+    {
+      "id_adopter": "2c7a27ed-53de-49e8-b16e-314394bb6ddb",
+      "id_hewan": "26b823c1-4bc4-44b7-afce-fa7c9e5eb2fc",
+      "status_pembayaran": "Lunas",
+      "tgl_mulai_adopsi": "2023-01-31",
+      "tgl_berhenti_adopsi": "2024-01-31",
+      "kontribusi_finansial": 600000
+    },
+    {
+      "id_adopter": "38938a4e-69ee-4208-8ba4-a99fdd0cce24",
+      "id_hewan": "33c9fb51-70a7-4154-9bbc-058eb6d53947",
+      "status_pembayaran": "Cicilan",
+      "tgl_mulai_adopsi": "2023-02-05",
+      "tgl_berhenti_adopsi": "2024-02-05",
+      "kontribusi_finansial": 700000
+    },
+    {
+      "id_adopter": "4df69917-e721-457e-94d8-7565f2915b55",
+      "id_hewan": "379e472c-e7f4-4dcd-9d58-04a39bf919e5",
+      "status_pembayaran": "Pending",
+      "tgl_mulai_adopsi": "2023-02-10",
+      "tgl_berhenti_adopsi": "2024-02-10",
+      "kontribusi_finansial": 800000
+    },
+    {
+      "id_adopter": "8f46ecb5-0d32-4daf-8d28-16a2113e1dd2",
+      "id_hewan": "41c132a8-d31d-4529-a191-f4a5cc039820",
+      "status_pembayaran": "Lunas",
+      "tgl_mulai_adopsi": "2023-02-15",
+      "tgl_berhenti_adopsi": "2024-02-15",
+      "kontribusi_finansial": 900000
+    },
+    {
+      "id_adopter": "9894263f-8afb-40e8-8f71-a8fe6ddabac5",
+      "id_hewan": "42956600-9a1b-42cf-b694-e0e9925ed8d5",
+      "status_pembayaran": "Cicilan",
+      "tgl_mulai_adopsi": "2023-02-20",
+      "tgl_berhenti_adopsi": "2024-02-20",
+      "kontribusi_finansial": 1000000
+    },
+    {
+      "id_adopter": "c175f585-86bc-4d47-8130-52c42591fad1",
+      "id_hewan": "435ddb68-251d-424f-84c5-99f6af1fda95",
+      "status_pembayaran": "Pending",
+      "tgl_mulai_adopsi": "2023-02-25",
+      "tgl_berhenti_adopsi": "2024-02-25",
+      "kontribusi_finansial": 1100000
+    },
+    {
+      "id_adopter": "d6624c5b-d18a-4215-a941-3be166317dfa",
+      "id_hewan": "4b554c24-7d78-4481-a182-3787666a1ebc",
+      "status_pembayaran": "Lunas",
+      "tgl_mulai_adopsi": "2023-03-02",
+      "tgl_berhenti_adopsi": "2024-03-01",
+      "kontribusi_finansial": 1200000
+    },
+    {
+      "id_adopter": "d6b5633c-f0a6-4710-8b5d-0b2cc29fb2fe",
+      "id_hewan": "5523ea62-cfe0-45f3-9b36-3cd5f0154a3d",
+      "status_pembayaran": "Cicilan",
+      "tgl_mulai_adopsi": "2023-03-07",
+      "tgl_berhenti_adopsi": "2024-03-06",
+      "kontribusi_finansial": 1300000
+    },
+    {
+      "id_adopter": "d9aeaaa4-e486-4bf7-b177-e97a1ff6a332",
+      "id_hewan": "5a760fe1-f033-411c-84fd-e4cc0c001940",
+      "status_pembayaran": "Pending",
+      "tgl_mulai_adopsi": "2023-03-12",
+      "tgl_berhenti_adopsi": "2024-03-11",
+      "kontribusi_finansial": 1400000
+    },
+    {
+      "id_adopter": "ed6d1454-20c8-48bb-bf8b-fb56f6096b1a",
+      "id_hewan": "60db1197-0105-4006-99d6-d0c3cb07d21b",
+      "status_pembayaran": "Lunas",
+      "tgl_mulai_adopsi": "2023-03-17",
+      "tgl_berhenti_adopsi": "2024-03-16",
+      "kontribusi_finansial": 1500000
+    },
+    {
+      "id_adopter": "edd640f9-8e64-4988-aa86-cc4e11c8f8eb",
+      "id_hewan": "6b65296a-ac38-479c-a145-f7c42c5d1155",
+      "status_pembayaran": "Cicilan",
+      "tgl_mulai_adopsi": "2023-03-22",
+      "tgl_berhenti_adopsi": "2024-03-21",
+      "kontribusi_finansial": 1600000
+    },
+    {
+      "id_adopter": "f102ce15-189b-4424-a39f-7412f1a89e0c",
+      "id_hewan": "722fa19d-f5f1-4156-ac2a-d3372f8c487b",
+      "status_pembayaran": "Pending",
+      "tgl_mulai_adopsi": "2023-03-27",
+      "tgl_berhenti_adopsi": "2024-03-26",
+      "kontribusi_finansial": 1700000
+    },
+    {
+      "id_adopter": "f343e422-2be0-41e3-9148-958100680e51",
+      "id_hewan": "7a2487e0-3c3a-4aaf-96c2-92333c72ffe8",
+      "status_pembayaran": "Lunas",
+      "tgl_mulai_adopsi": "2023-04-01",
+      "tgl_berhenti_adopsi": "2024-03-31",
+      "kontribusi_finansial": 1800000
+    },
+    {
+      "id_adopter": "f762efa3-02ae-4607-985a-09389822eaab",
+      "id_hewan": "7c0c8348-93dd-4c89-a3b0-544f710ac81b",
+      "status_pembayaran": "Cicilan",
+      "tgl_mulai_adopsi": "2023-04-06",
+      "tgl_berhenti_adopsi": "2024-04-05",
+      "kontribusi_finansial": 1900000
+    },
+    {
+      "id_adopter": "fc5e862a-895f-44a0-9337-2db78735549e",
+      "id_hewan": "7d5317fe-ca7a-4639-b27c-618b0a921b28",
+      "status_pembayaran": "Pending",
+      "tgl_mulai_adopsi": "2023-04-11",
+      "tgl_berhenti_adopsi": "2024-04-10",
+      "kontribusi_finansial": 2000000
+    },
+    {
+      "id_adopter": "00ef59f4-e236-406f-8139-6d864cbfadb4",
+      "id_hewan": "8825f4f1-9bc5-4c6c-91b4-eb6004624206",
+      "status_pembayaran": "Lunas",
+      "tgl_mulai_adopsi": "2023-04-16",
+      "tgl_berhenti_adopsi": "2024-04-15",
+      "kontribusi_finansial": 2100000
+    },
+    {
+      "id_adopter": "03a65731-e0cd-4f79-86e5-074ce4229bc9",
+      "id_hewan": "936506cc-b859-4264-be9d-ddc1d75f5d96",
+      "status_pembayaran": "Cicilan",
+      "tgl_mulai_adopsi": "2023-04-21",
+      "tgl_berhenti_adopsi": "2024-04-20",
+      "kontribusi_finansial": 2200000
+    },
+    {
+      "id_adopter": "068cad0c-2799-4bed-9f40-be07243465bb",
+      "id_hewan": "a1f190e2-9765-47fd-8959-d63bded00bdd",
+      "status_pembayaran": "Pending",
+      "tgl_mulai_adopsi": "2023-04-26",
+      "tgl_berhenti_adopsi": "2024-04-25",
+      "kontribusi_finansial": 2300000
+    },
+    {
+      "id_adopter": "0b7ff90d-6328-4d27-af96-7de622f4d265",
+      "id_hewan": "a2ab5846-66ad-4575-bf64-17cd4cccb29f",
+      "status_pembayaran": "Lunas",
+      "tgl_mulai_adopsi": "2023-05-01",
+      "tgl_berhenti_adopsi": "2024-04-30",
+      "kontribusi_finansial": 2400000
+    },
+    {
+      "id_adopter": "177af5ed-0fef-406a-9846-7b87d15071ea",
+      "id_hewan": "a58f451f-f832-47ba-92e2-98e98a8f339b",
+      "status_pembayaran": "Cicilan",
+      "tgl_mulai_adopsi": "2023-05-06",
+      "tgl_berhenti_adopsi": "2024-05-05",
+      "kontribusi_finansial": 2500000
+    },
+    {
+      "id_adopter": "2c7a27ed-53de-49e8-b16e-314394bb6ddb",
+      "id_hewan": "ae54c27b-4ad5-48e3-8ffc-9f2eb0b824ac",
+      "status_pembayaran": "Pending",
+      "tgl_mulai_adopsi": "2023-05-11",
+      "tgl_berhenti_adopsi": "2024-05-10",
+      "kontribusi_finansial": 2600000
+    },
+    {
+      "id_adopter": "38938a4e-69ee-4208-8ba4-a99fdd0cce24",
+      "id_hewan": "b49e6473-9709-41f0-ab8b-ddad350c5e3e",
+      "status_pembayaran": "Lunas",
+      "tgl_mulai_adopsi": "2023-05-16",
+      "tgl_berhenti_adopsi": "2024-05-15",
+      "kontribusi_finansial": 2700000
+    },
+    {
+      "id_adopter": "4df69917-e721-457e-94d8-7565f2915b55",
+      "id_hewan": "b4d43e52-0879-498c-94b0-da2c727058ae",
+      "status_pembayaran": "Cicilan",
+      "tgl_mulai_adopsi": "2023-05-21",
+      "tgl_berhenti_adopsi": "2024-05-20",
+      "kontribusi_finansial": 2800000
+    },
+    {
+      "id_adopter": "8f46ecb5-0d32-4daf-8d28-16a2113e1dd2",
+      "id_hewan": "bbd125b6-1f9b-42ef-8868-b65cdf11a4cd",
+      "status_pembayaran": "Pending",
+      "tgl_mulai_adopsi": "2023-05-26",
+      "tgl_berhenti_adopsi": "2024-05-25",
+      "kontribusi_finansial": 2900000
+    },
+    {
+      "id_adopter": "9894263f-8afb-40e8-8f71-a8fe6ddabac5",
+      "id_hewan": "c1d56dfe-abdc-44a2-bf30-8b3e4e8916d8",
+      "status_pembayaran": "Lunas",
+      "tgl_mulai_adopsi": "2023-05-31",
+      "tgl_berhenti_adopsi": "2024-05-30",
+      "kontribusi_finansial": 3000000
+    }
+  ]
