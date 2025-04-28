@@ -10,9 +10,9 @@ urlpatterns = [
     path('register/dokter-hewan/', register_dokter_hewan, name='register_dokter_hewan'),
     path('register/staff/', register_staff, name='register_staff'),
     path('logout/', logout_user, name='logout'),
-    path('dashboard', dashboard, name='dashboard'),
-    path('profile', profile, name='profile'),
-    path('change-password', change_password, name='change_password'),
+    path('dashboard/', dashboard, name='dashboard'),
+    path('profile/', profile, name='profile'),
+    path('change-password/', change_password, name='change_password'),
     path('show_message/', show_message, name='show_message')
 
 ]

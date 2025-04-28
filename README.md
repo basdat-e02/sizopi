@@ -2,13 +2,13 @@
 
 ## 📋 Daftar Fitur dan Kontributor
 
-| Warna Fitur | Nama Fitur   | Dikerjakan Oleh                         |
-|-------------|--------------|----------------------------------------|
-| Putih       | Fitur Putih  | Rafie Asadel Tarigan                   |
-| Kuning      | Fitur Kuning | Rafie Asadel Tarigan                   |
-| Hijau       | Fitur Hijau  | Ananda Joy Pratiwi Pasha Patoding     |
-| Biru        | Fitur Biru   | Muhammad Fadhil Nur Aziz              |
-| Merah       | Fitur Merah  | Khoirul Azmi                          |
+| Warna Fitur | Dikerjakan Oleh                         |
+|-------------|----------------------------------------|
+| Putih       | Rafie Asadel Tarigan                   |
+| Kuning      | Rafie Asadel Tarigan                   |
+| Hijau       | Ananda Joy Pratiwi Pasha Patoding     |
+| Biru        | Muhammad Fadhil Nur Aziz              |
+| Merah       | Khoirul Azmi                          |
 
 ## 🚀 Getting Started
 
@@ -28,11 +28,20 @@ pip install -r requirements.txt
 ```
 
 ### Set Up DataBase
+Create a `.env` file in the root directory of the project. Then copy and paste the following configuration into the `.env` file:
+```.env
+user=postgres.nktxoorzfzijgjshumsi 
+password=sizopi123__
+host=aws-0-ap-southeast-1.pooler.supabase.com
+port=6543
+dbname=postgres
+```
+After setting up the .env file, run the following commands in your terminal:
 ```bash
 python manage.py reset_schema
 python manage.py create_table
 python manage.py insert_data
-python manage.py insert_fucntion
+python manage.py insert_function
 ```
 
 ### Run Development Server
