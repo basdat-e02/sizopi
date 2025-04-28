@@ -418,3 +418,10 @@ INSERT INTO adopsi VALUES ('00ef59f4-e236-406f-8139-6d864cbfadb4','055df7d4-9239
 	('4df69917-e721-457e-94d8-7565f2915b55','b4d43e52-0879-498c-94b0-da2c727058ae','Cicilan','2023-05-21 00:00:00','2024-05-20 00:00:00',2800000),
 	('8f46ecb5-0d32-4daf-8d28-16a2113e1dd2','bbd125b6-1f9b-42ef-8868-b65cdf11a4cd','Pending','2023-05-26 00:00:00','2024-05-25 00:00:00',2900000),
 	('9894263f-8afb-40e8-8f71-a8fe6ddabac5','c1d56dfe-abdc-44a2-bf30-8b3e4e8916d8','Lunas','2023-05-31 00:00:00','2024-05-30 00:00:00',3000000);
+
+INSERT INTO reservasi VALUES ('user1', 'Safari Singa Liar', '2025-01-04', '2', 'Confirmed'), 
+	('user2', 'Akrobat Lumba-lumba', '2025-01-07', '3', 'Cancelled'), 
+	('user3', 'Penerbangan Elang', '2025-01-10', '4', 'Pending'), 
+	('user4', 'Parade Gajah Asia', '2025-01-13', '1', 'Confirmed'), 
+	('user5', 'Aksi Anjing Laut', '2025-01-16', '2', 'Cancelled');
+	

@@ -41,13 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'corsheaders',
     # apps
     'sizopi',
     'main',
     'satwa_habitat',
     'adopsi_manager',
-    'django.contrib.humanize',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
