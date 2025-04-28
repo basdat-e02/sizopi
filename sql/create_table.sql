@@ -193,3 +193,16 @@ CREATE TABLE ADOPSI (
   FOREIGN KEY (id_adopter) REFERENCES ADOPTER(id_adopter),
   FOREIGN KEY (id_hewan)   REFERENCES HEWAN(id)
 );
+
+-- 23. Table RESERVASI
+CREATE TABLE RESERVASI (
+    username_p VARCHAR(50),
+    nama_fasilitas VARCHAR(50),
+    tanggal_kunjungan DATE,
+    jumlah_tiket INT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    PRIMARY KEY (username_p, nama_fasilitas, tanggal_kunjungan),
+    FOREIGN KEY (username_p) REFERENCES PENGUNJUNG(username_p),
+    FOREIGN KEY (nama_fasilitas) REFERENCES FASILITAS(nama)
+);
+

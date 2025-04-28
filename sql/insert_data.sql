@@ -312,3 +312,23 @@ SELECT
   DATE '2023-01-01' + ((s.g * 5) + 365 || ' days')::interval AS tgl_berhenti_adopsi,
   (s.g * 100000) AS kontribusi_finansial
 FROM series s;
+
+-- 23. RESERVASI (5 records)
+INSERT INTO RESERVASI (username_p, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status)
+SELECT
+  'user' || g AS username_p,
+  CASE (g % 5)
+    WHEN 0 THEN 'Aksi Anjing Laut'
+    WHEN 1 THEN 'Safari Singa Liar'
+    WHEN 2 THEN 'Akrobat Lumba-lumba'
+    WHEN 3 THEN 'Penerbangan Elang'
+    ELSE 'Parade Gajah Asia'
+  END AS nama_fasilitas,
+  DATE '2025-01-01' + (g * 3 || ' days')::interval AS tanggal_kunjungan,
+  (g % 4 + 1) AS jumlah_tiket,
+  CASE (g % 3)
+    WHEN 0 THEN 'Pending'
+    WHEN 1 THEN 'Confirmed'
+    ELSE 'Cancelled'
+  END AS status
+FROM generate_series(1, 5) AS g;
