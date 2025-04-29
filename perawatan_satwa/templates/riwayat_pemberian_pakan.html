@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block meta %}
+<title>Riwayat Pemberian Pakan</title>
+{% endblock meta %}
+
+{% block content %}
+
+{% include "navbar.html" %}
+
+<div class="container mx-auto p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
+      RIWAYAT PEMBERIAN PAKAN
+    </h2>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full table-auto border border-gray-300 dark:border-gray-700">
+        <thead class="bg-gray-200 dark:bg-gray-700">
+          <tr class="text-gray-700 dark:text-gray-300 text-sm">
+            <th class="border px-4 py-2">Nama Individu (hewan)</th>
+            <th class="border px-4 py-2">Spesies</th>
+            <th class="border px-4 py-2">Asal Hewan</th>
+            <th class="border px-4 py-2">Tanggal Lahir</th>
+            <th class="border px-4 py-2">Habitat</th>
+            <th class="border px-4 py-2">Status Kesehatan</th>
+            <th class="border px-4 py-2">Jenis Pakan</th>
+            <th class="border px-4 py-2">Jumlah Pakan (gram)</th>
+            <th class="border px-4 py-2">Jadwal</th>
+          </tr>
+        </thead>
+        <tbody class="text-center text-gray-700 dark:text-gray-300 text-sm">
+          <!-- Baris dummy Pisang -->
+          <tr>
+            <td class="border px-4 py-2">Boni</td>
+            <td class="border px-4 py-2">Orangutan</td>
+            <td class="border px-4 py-2">Kalimantan</td>
+            <td class="border px-4 py-2">2011-06-12</td>
+            <td class="border px-4 py-2">Kubah 2</td>
+            <td class="border px-4 py-2">Sehat</td>
+            <td class="border px-4 py-2">Pisang</td>
+            <td class="border px-4 py-2">500</td>
+            <td class="border px-4 py-2">2025-04-25 09:00:00</td>
+          </tr>
+          <!-- Baris dummy Daging Ayam -->
+          <tr>
+            <td class="border px-4 py-2">Leo</td>
+            <td class="border px-4 py-2">Harimau Sumatera</td>
+            <td class="border px-4 py-2">Sumatera Selatan</td>
+            <td class="border px-4 py-2">2016-02-21</td>
+            <td class="border px-4 py-2">Kandang K Carnivora</td>
+            <td class="border px-4 py-2">Sehat</td>
+            <td class="border px-4 py-2">Daging Ayam</td>
+            <td class="border px-4 py-2">800</td>
+            <td class="border px-4 py-2">2025-03-05 08:30:00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
