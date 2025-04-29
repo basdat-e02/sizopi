@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'main',
     'satwa_habitat',
     'adopsi_manager',
+    'manajemen_kesehatan',
+    'perawatan_satwa',
 ]
 
 MIDDLEWARE = [
@@ -127,7 +129,7 @@ class DisableMigrations:
     def __getitem__(self, item):
         return None
 
-MIGRATION_MODULES = DisableMigrations()
+# MIGRATION_MODULES = DisableMigrations()
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block meta %}
+<title>Jadwal Pemeriksaan Kesehatan</title>
+{% endblock meta %}
+
+{% block content %}
+
+{% include "navbar.html" %}
+
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
+  <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+
+    <!-- Header -->
+    <h1 class="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
+      JADWAL PEMERIKSAAN KESEHATAN
+    </h1>
+
+    <!-- Frekuensi -->
+    <div class="text-center mb-4">
+      <p class="text-gray-700 dark:text-gray-300 text-lg">
+        Frekuensi Pemeriksaan Rutin:
+        <span id="frekuensiDisplay" class="font-semibold">3 bulan sekali</span>
+      </p>
+    </div>
+
+    <!-- Tombol Tambah -->
+    <div class="flex justify-end mb-4">
+      <button id="tambahJadwalBtn" class="text-blue-600 hover:underline font-semibold">
+        [+ Tambah Jadwal Pemeriksaan]
+      </button>
+    </div>
+
+    <!-- Tabel Jadwal -->
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100">
+        <thead class="bg-gray-200 dark:bg-gray-700">
+          <tr>
+            <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+              Tanggal Pemeriksaan Selanjutnya
+            </th>
+          </tr>
+        </thead>
+        <tbody id="jadwalTable">
+          <tr>
+            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+              2025-03-20
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Tambah Jadwal -->
+<div id="tambahJadwalModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+    <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">
+      TAMBAH JADWAL
+    </h2>
+
+    <div class="mb-4">
+      <label for="inputTanggalJadwal" class="block text-gray-700 dark:text-gray-300 mb-2">
+        Tanggal Pemeriksaan Selanjutnya:
+      </label>
+      <input type="date" id="inputTanggalJadwal" class="w-full border rounded p-2">
+    </div>
+
+    <div class="flex justify-center space-x-6 mt-6">
+      <button id="saveJadwalBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">SIMPAN</button>
+      <button id="batalBtn" class="px-4 py-2 border rounded text-gray-700 dark:text-gray-300">BATAL</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const tambahJadwalBtn = document.getElementById('tambahJadwalBtn');
+  const tambahJadwalModal = document.getElementById('tambahJadwalModal');
+  const saveJadwalBtn = document.getElementById('saveJadwalBtn');
+  const batalBtn = document.getElementById('batalBtn');
+  const inputTanggalJadwal = document.getElementById('inputTanggalJadwal');
+  const jadwalTable = document.getElementById('jadwalTable');
+
+  tambahJadwalBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    tambahJadwalModal.classList.remove('hidden');
+    tambahJadwalModal.classList.add('flex');
+  });
+
+  batalBtn.addEventListener('click', () => {
+    closeTambahJadwal();
+  });
+
+  function closeTambahJadwal() {
+    tambahJadwalModal.classList.add('hidden');
+    tambahJadwalModal.classList.remove('flex');
+    inputTanggalJadwal.value = '';
+  }
+
+  saveJadwalBtn.addEventListener('click', () => {
+    const tanggal = inputTanggalJadwal.value;
+    const today = new Date().toISOString().split('T')[0];
+
+    if (!tanggal) {
+      alert('Silakan pilih tanggal terlebih dahulu.');
+      return;
+    }
+
+    if (tanggal < today) {
+      alert('Tdak dapat memilih tanggal di masa lalu.');
+      return;
+    }
+
+    addTanggalKeTabel(tanggal);
+    closeTambahJadwal();
+    alert('Jadwal berhasil ditambahkan.');
+  });
+
+  function addTanggalKeTabel(tanggal) {
+    // Tambahkan tanggal baru
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+      <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">${tanggal}</td>
+    `;
+    jadwalTable.appendChild(newRow);
+
+    // Urutkan tabel
+    sortTableByDate();
+  }
+
+  function sortTableByDate() {
+    let rows = Array.from(jadwalTable.querySelectorAll('tr'));
+
+    rows.sort((a, b) => {
+      const dateA = new Date(a.children[0].textContent.trim());
+      const dateB = new Date(b.children[0].textContent.trim());
+      return dateA - dateB;
+    });
+
+    jadwalTable.innerHTML = '';
+    rows.forEach(row => jadwalTable.appendChild(row));
+  }
+</script>
+
+{% endblock content %}
