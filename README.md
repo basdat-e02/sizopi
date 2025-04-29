@@ -48,3 +48,17 @@ python manage.py insert_function
 ```bash
 python manage.py runserver
 ```
+
+## 🔖 Dummy User Accounts for Testing
+
+Berikut beberapa akun yang dapat digunakan untuk pengujian fitur login dan dashboard:
+
+| Role                   | Username  | Password    |
+|------------------------|-----------|-------------|
+| Pengunjung             | user1     | password1   |
+| Dokter Hewan           | user51    | password51  |
+| Penjaga Hewan          | user66    | password66  |
+| Pelatih Pertunjukan    | user76    | password76  |
+| Staf Administrasi      | user86    | password86  |
+
+Dengan data di atas, Anda bisa langsung menguji alur login, tampilan dashboard, dan pembatasan akses berdasarkan role.

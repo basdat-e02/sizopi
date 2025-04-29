@@ -1,93 +1,108 @@
 {% extends "base.html" %}
 
 {% block meta %}
-<title>Dashboard</title>
+  <title>Dashboard</title>
 {% endblock meta %}
 
 {% block content %}
 {% include "navbar.html" %}
-<div class="min-h-screen flex items-start justify-center bg-gray-100 dark:bg-gray-900 py-12">
-  <div class="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-8">
+<div class="min-h-screen flex items-start justify-center bg-gray-100 dark:bg-gray-900 py-16">
+  <div class="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-10 space-y-8">
 
-    {# ───────────────────── GUEST ───────────────────── #}
+    {# Jika belum login #}
     {% if role == "unknown" %}
-      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center">Silakan Login</h1>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 text-center mb-6">Silakan Login</h1>
       <p class="text-center text-gray-600 dark:text-gray-400">
         Anda belum masuk. <a href="{% url 'login' %}" class="text-blue-500 hover:underline">Login</a> atau
-        <a href="{% url 'register' %}" class="text-blue-500 hover:underline">Buat Akun</a>.
+        <a href="{% url 'register' %}" class="text-blue-500 hover:underline">Buat Akun</a>.
       </p>
 
     {% else %}
-      {# ───────────── INFO DASAR (SEMUA ROLE) ──────────── #}
-      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Profil Pengguna</h1>
-      <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-        <li><strong>Nama&nbsp;Lengkap :</strong> Contoh Nama</li>
-        <li><strong>Username&nbsp;&nbsp;&nbsp;&nbsp;:</strong> contohuser</li>
-        <li><strong>Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> user@example.com</li>
-        <li><strong>No&nbsp;Telepon&nbsp;&nbsp;:</strong> 0812‑3456‑7890</li>
-        <li><strong>Peran&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> {{ role|title }}</li>
+      {# Info Dasar Semua Role #}
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Profil Pengguna</h1>
+      <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+        <li><strong>Nama Lengkap :</strong> {{ full_name }}</li>
+        <li><strong>Username :</strong> {{ username }}</li>
+        <li><strong>Email :</strong> {{ email }}</li>
+        <li><strong>No Telepon :</strong> {{ phone }}</li>
+        <li><strong>Peran :</strong> {{ role|title }}</li>
       </ul>
 
-      {# ───────────── PENGUNJUNG & ADOPTER ─────────────── #}
+      {# Pengunjung & Adopter #}
       {% if role == "pengunjung" or role == "pengunjung_adopter" %}
-        <h2 class="text-xl font-semibold mt-6 text-gray-800 dark:text-gray-100">Info Pengunjung</h2>
-        <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-          <li><strong>Alamat&nbsp;Lengkap :</strong> Jl. Contoh No 1, Bandung</li>
-          <li><strong>Tanggal&nbsp;Lahir :</strong> 01‑01‑2000</li>
-          <li><strong>Riwayat&nbsp;Kunjungan :</strong> 3× kunjungan</li>
-          <li><strong>Tiket&nbsp;Terbeli :</strong> 5 tiket</li>
-        </ul>
+        <div class="pt-6">
+          <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Info Pengunjung</h2>
+          <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+            <li><strong>Alamat Lengkap :</strong> {{ address }}</li>
+            <li><strong>Tanggal Lahir :</strong> {{ birthdate }}</li>
+            <li><strong>Riwayat Kunjungan :</strong> {{ visit_count }}× kunjungan</li>
+            <li><strong>Tiket Terbeli :</strong> {{ ticket_count }} tiket</li>
+          </ul>
 
-        {% if role == "pengunjung_adopter" %}
-          <h3 class="text-lg font-semibold mt-4 text-gray-800 dark:text-gray-100">Hewan Adopsi</h3>
-          <p class="text-gray-700 dark:text-gray-300">
-            • Harimau Sumatra (ID 1234) – status: aktif<br>
-            • Orangutan (ID 5678) – status: selesai
-          </p>
-        {% endif %}
+          {% if role == "pengunjung_adopter" %}
+            <h3 class="text-xl font-semibold mt-6 text-gray-800 dark:text-gray-100">Hewan Adopsi</h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+              {% for name,status in adoptions %}
+                <li>{{ name }} – status: {{ status }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
       {% endif %}
 
-      {# ───────────── DOKTER HEWAN ───────────── #}
+      {# Dokter Hewan #}
       {% if role == "dokter hewan" %}
-        <h2 class="text-xl font-semibold mt-6 text-gray-800 dark:text-gray-100">Info Dokter Hewan</h2>
-        <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-          <li><strong>No&nbsp;Sertifikasi :</strong> STR‑00123</li>
-          <li><strong>Spesialisasi&nbsp; :</strong> Mamalia Besar, Reptil</li>
-          <li><strong>Hewan&nbsp;Ditangani :</strong> 14 ekor</li>
-        </ul>
+        <div class="pt-6">
+          <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Info Dokter Hewan</h2>
+          <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+            <li><strong>No Sertifikasi :</strong> {{ certification }}</li>
+            <li><strong>Spesialisasi :</strong> {{ specializations|join:", " }}</li>
+            <li><strong>Hewan Ditangani :</strong> {{ handled_count }} ekor</li>
+          </ul>
+        </div>
       {% endif %}
 
-      {# ───────────── PENJAGA HEWAN ───────────── #}
+            {# Role lain bisa ditambah di sini #}
+
+      {# Penjaga Hewan #}
       {% if role == "penjaga hewan" %}
-        <h2 class="text-xl font-semibold mt-6 text-gray-800 dark:text-gray-100">Info Penjaga Hewan</h2>
-        <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-          <li><strong>ID&nbsp;Staf&nbsp; :</strong> PJH‑987</li>
-          <li><strong>Hewan&nbsp;Diberi Pakan :</strong> 22 ekor hari ini</li>
-        </ul>
+        <div class="pt-6">
+          <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Info Penjaga Hewan</h2>
+          <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+            <li><strong>ID Staf :</strong> {{ staff_id }}</li>
+            <li><strong>Hewan Diberi Pakan Hari Ini :</strong> {{ fed_count }} ekor</li>
+          </ul>
+        </div>
       {% endif %}
 
-      {# ───────────── STAF ADMIN ───────────── #}
+      {# Staf Administrasi #}
       {% if role == "staf admin" %}
-        <h2 class="text-xl font-semibold mt-6 text-gray-800 dark:text-gray-100">Info Staf Administrasi</h2>
-        <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-          <li><strong>ID&nbsp;Staf&nbsp; :</strong> ADM‑123</li>
-          <li><strong>Penjualan&nbsp;Hari Ini :</strong> 125 tiket (Rp 12.500.000)</li>
-          <li><strong>Pengunjung&nbsp;Hari Ini :</strong> 380 orang</li>
-          <li><strong>Pendapatan&nbsp;Mingguan :</strong> Rp 85.000.000</li>
-        </ul>
+        <div class="pt-6">
+          <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Info Staf Administrasi</h2>
+          <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+            <li><strong>ID Staf :</strong> {{ staff_id }}</li>
+            <li><strong>Penjualan Tiket Hari Ini :</strong> {{ sales_today }} tiket (Rp {{ revenue_today }})</li>
+            <li><strong>Pengunjung Hari Ini :</strong> {{ visitor_count }} orang</li>
+            <li><strong>Pendapatan Mingguan :</strong> Rp {{ weekly_revenue }}</li>
+          </ul>
+        </div>
       {% endif %}
 
-      {# ───────────── PELATIH PERTUNJUKAN ───────────── #}
+      {# Pelatih Pertunjukan #}
       {% if role == "pelatih pertunjukan" %}
-        <h2 class="text-xl font-semibold mt-6 text-gray-800 dark:text-gray-100">Info Pelatih Pertunjukan</h2>
-        <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-          <li><strong>ID&nbsp;Staf&nbsp; :</strong> PLP‑555</li>
-          <li><strong>Jadwal&nbsp;Hari Ini :</strong> 14:00 Atraksi Lumba‑Lumba</li>
-          <li><strong>Hewan&nbsp;Dilatih :</strong> Lumba‑lumba (3 ekor)</li>
-          <li><strong>Status Latihan Terakhir :</strong> Selesai pukul 10:30</li>
-        </ul>
+        <div class="pt-6">
+          <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Info Pelatih Pertunjukan</h2>
+          <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+            <li><strong>ID Staf :</strong> {{ staff_id }}</li>
+            <li><strong>Jadwal Pertunjukan Hari Ini :</strong> {{ show_schedule }}</li>
+            <li><strong>Hewan Dilatih :</strong> {{ trained_count }} ekor</li>
+            <li><strong>Status Latihan Terakhir :</strong> {{ last_training_status }}</li>
+          </ul>
+        </div>
       {% endif %}
+
     {% endif %}
+
   </div>
 </div>
 {% endblock content %}
