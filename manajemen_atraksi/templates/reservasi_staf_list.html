@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
+  <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-6">
+
+    <div class="overflow-x-auto">
+      <table class="table-auto w-full text-sm text-left text-gray-800 dark:text-gray-100 border">
+        <thead class="bg-gray-200 dark:bg-gray-700 text-sm font-semibold">
+          <tr>
+            <th class="border px-4 py-2">Nama Pengunjung</th>
+            <th class="border px-4 py-2">Nama Atraksi</th>
+            <th class="border px-4 py-2">Tanggal Kunjungan</th>
+            <th class="border px-4 py-2">Jumlah Tiket</th>
+            <th class="border px-4 py-2">Status</th>
+            <th class="border px-4 py-2">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in reservasi %}
+          <tr class="bg-white dark:bg-gray-800">
+            <td class="border px-4 py-2">{{ res.nama_pengunjung }}</td>
+            <td class="border px-4 py-2">{{ res.nama_fasilitas }}</td>
+            <td class="border px-4 py-2">{{ res.tanggal_kunjungan }}</td>
+            <td class="border px-4 py-2">{{ res.jumlah_tiket }}</td>
+            <td class="border px-4 py-2">
+              {% if res.status == 'Terjadwal' %}
+                <span class="badge badge-success bg-green-500 text-white px-2 py-1 rounded-full text-xs">{{ res.status }}</span>
+              {% else %}
+                <span class="badge badge-warning bg-yellow-500 text-white px-2 py-1 rounded-full text-xs">{{ res.status }}</span>
+              {% endif %}
+            </td>
+            <td class="border px-4 py-2 space-x-2">
+              <a href="{% url 'manajemen_atraksi:reservasi_edit' res.nama_fasilitas res.tanggal_kunjungan %}" 
+                 class="text-blue-500 hover:underline">[Edit]</a>
+              <a href="{% url 'manajemen_atraksi:reservasi_delete' res.nama_fasilitas res.tanggal_kunjungan %}" 
+                 class="text-red-500 hover:underline" onclick="return confirm('Apakah Anda yakin ingin menghapus reservasi ini?')">[Hapus]</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="overflow-x-auto bg-gray-800 shadow-lg rounded-lg">
+      <div class="border-b bg-gray-700 text-white px-6 py-3">
+          <h4 class="text-lg font-semibold mb-0">Daftar Wahana</h4>
+      </div>
+      <div class="p-6">
+          <table class="min-w-full table-auto text-white">
+              <thead class="bg-gray-700">
+                  <tr>
+                      <th class="px-6 py-3 text-left font-semibold">Nama Wahana</th>
+                      <th class="px-6 py-3 text-left font-semibold">Kapasitas</th>
+                      <th class="px-6 py-3 text-left font-semibold">Jadwal</th>
+                      <th class="px-6 py-3 text-left font-semibold">Peraturan</th>
+                      <th class="px-6 py-3 text-center font-semibold">Aksi</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for wahana in wahana_list %}
+                  <tr class="border-t border-gray-700 hover:bg-gray-700">
+                      <td class="px-6 py-4">{{ wahana.nama }}</td>
+                      <td class="px-6 py-4">{{ wahana.kapasitas }} orang</td>
+                      <td class="px-6 py-4">{{ wahana.jadwal }}</td>
+                      <td class="px-6 py-4">
+                          <ol class="list-disc pl-6">
+                              {% for peraturan in wahana.peraturan %}
+                              <li>{{ peraturan }}</li>
+                              {% endfor %}
+                          </ol>
+                      </td>
+                      <td class="px-6 py-4 text-center space-x-2">
+                          <a href="{% url 'manajemen_atraksi:wahana_update' wahana.nama %}" 
+                             class="text-blue-500 hover:underline">
+                             [Edit]
+                          </a>
+                          <a href="{% url 'manajemen_atraksi:wahana_delete' wahana.nama %}" 
+                             class="text-red-500 hover:underline" >
+                             [Hapus]
+                          </a>
+                      </td>
+                      
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+  </div>
+  </div>
+</div>
+
+
+{% endblock %}

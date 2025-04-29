@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-900 text-white py-12 px-6">
+    <div class="max-w-lg mx-auto bg-gray-800 shadow-lg rounded-lg">
+
+        <div class="bg-red-600 text-white p-4 rounded-t-lg">
+            <h4 class="text-xl font-semibold">Hapus Wahana</h4>
+        </div>
+
+        <div class="p-6">
+            <p class="text-lg mb-4">Apakah Anda yakin ingin menghapus wahana ini?</p>
+            <p><strong>Nama Wahana:</strong> {{ wahana.nama }}</p>
+            <p><strong>Kapasitas:</strong> {{ wahana.kapasitas }} orang</p>
+            <p><strong>Jadwal:</strong> {{ wahana.jadwal }}</p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="flex justify-end gap-4 mt-6">
+                    <a href="{% url 'manajemen_atraksi:wahana_list' %}"
+                       class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-500">
+                        <i class="bi bi-x-circle"></i> Tidak
+                    </a>
+                    <button type="submit"
+                            class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        <i class="bi bi-trash"></i> Ya, Hapus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

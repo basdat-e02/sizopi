@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
+    <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-6">
+      
+      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Konfirmasi Pembatalan Reservasi</h2>
+      <p class="text-gray-700 dark:text-gray-200">Apakah Anda yakin ingin membatalkan reservasi untuk <strong>{{ nama_atraksi }}</strong> pada tanggal <strong>{{ tanggal }}</strong>?</p>
+
+      <form method="POST" class="space-y-4">
+        {% csrf_token %}
+        <div class="flex justify-center">
+          <button type="submit" class="bg-red-500 text-white py-2 px-6 rounded-lg hover:bg-red-600 transition duration-300">Ya, batalkan reservasi</button>
+        </div>
+      </form>
+
+      <!-- Kembali ke daftar reservasi dengan role yang sesuai -->
+      <div class="flex justify-center mt-4">
+        <a href="{% url 'manajemen_atraksi:reservasi_list' role='staf admin' %}" class="text-blue-500 hover:underline transition duration-300">Kembali ke Daftar Reservasi</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

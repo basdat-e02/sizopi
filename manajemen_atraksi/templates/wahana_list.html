@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="min-h-screen bg-gray-900 py-12 px-6">
+    <div class="max-w-6xl mx-auto">
+        <h2 class="text-2xl font-bold mb-6 text-white">Data Wahana</h2>
+
+        <div class="mb-4">
+            <a href="{% url 'manajemen_atraksi:wahana_create' %}" class="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">
+                <i class="bi bi-plus-circle"></i> Tambah Wahana
+            </a>
+        </div>
+
+        <div class="overflow-x-auto bg-gray-800 shadow-lg rounded-lg">
+            <div class="border-b bg-gray-700 text-white px-6 py-3">
+                <h4 class="text-lg font-semibold mb-0">Daftar Wahana</h4>
+            </div>
+            <div class="p-6">
+                <table class="min-w-full table-auto text-white">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left font-semibold">Nama Wahana</th>
+                            <th class="px-6 py-3 text-left font-semibold">Kapasitas</th>
+                            <th class="px-6 py-3 text-left font-semibold">Jadwal</th>
+                            <th class="px-6 py-3 text-left font-semibold">Peraturan</th>
+                            <th class="px-6 py-3 text-center font-semibold">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for wahana in wahana_list %}
+                        <tr class="border-t border-gray-700 hover:bg-gray-700">
+                            <td class="px-6 py-4">{{ wahana.nama }}</td>
+                            <td class="px-6 py-4">{{ wahana.kapasitas }} orang</td>
+                            <td class="px-6 py-4">{{ wahana.jadwal }}</td>
+                            <td class="px-6 py-4">
+                                <ol class="list-disc pl-6">
+                                    {% for peraturan in wahana.peraturan %}
+                                    <li>{{ peraturan }}</li>
+                                    {% endfor %}
+                                </ol>
+                            </td>
+                            <td class="px-6 py-4 text-center space-x-2">
+                                <a href="{% url 'manajemen_atraksi:wahana_update' wahana.nama %}" 
+                                   class="text-blue-500 hover:underline">
+                                   [Edit]
+                                </a>
+                                <a href="{% url 'manajemen_atraksi:wahana_delete' wahana.nama %}" 
+                                   class="text-red-500 hover:underline" >
+                                   [Hapus]
+                                </a>
+                            </td>
+                            
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
