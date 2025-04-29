@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
+    <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-6">
+      
+      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">{{ action }}</h2>
+
+      <form method="POST" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Dropdown Nama Wahana -->
+        <div class="flex flex-col">
+          <label for="nama_atraksi" class="text-gray-700 dark:text-gray-200">Nama Wahana</label>
+          <select name="nama_atraksi" class="mt-2 p-2 border rounded-md text-gray-800 dark:text-gray-100" required>
+            <option value="" disabled selected>Pilih Wahana</option>
+            {% for atraksi in atraksi %}
+              <option value="{{ atraksi }}" {% if atraksi == reservasi.nama_atraksi %}selected{% endif %}>{{ atraksi }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Peraturan (Tidak bisa diedit) -->
+        <div class="flex flex-col">
+          <label for="peraturan" class="text-gray-700 dark:text-gray-200">Peraturan</label>
+          <textarea id="peraturan" name="peraturan" rows="4" class="mt-2 p-2 border rounded-md text-gray-800 dark:text-gray-100" readonly>{{ peraturan }}</textarea>
+        </div>
+
+        <!-- Tanggal dan Jam Kunjungan -->
+        <div class="flex flex-col">
+          <label for="tanggal_waktu" class="text-gray-700 dark:text-gray-200">Tanggal & Jam Kunjungan</label>
+          <input type="datetime-local" name="tanggal_waktu" class="mt-2 p-2 border rounded-md text-gray-800 dark:text-gray-100" required>
+        </div>
+
+        <!-- Jumlah Tiket -->
+        <div class="flex flex-col">
+          <label for="jumlah_tiket" class="text-gray-700 dark:text-gray-200">Jumlah Tiket</label>
+          <input type="number" name="jumlah_tiket" class="mt-2 p-2 border rounded-md text-gray-800 dark:text-gray-100" required min="1">
+        </div>
+
+        <!-- Tombol Submit -->
+        <div class="flex justify-center">
+          <button type="submit" class="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300">Buat Reservasi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

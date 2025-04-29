@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2 class="mb-4 text-center">{{ action }}</h2>
+
+    <!-- Button Buat Reservasi -->
+    <div class="text-right mb-4">
+      <a href="{% url 'manajemen_atraksi:reservasi_create' %}" class="btn btn-success btn-lg">
+        + Buat Reservasi
+      </a>
+    </div>
+
+    <!-- Tabel Reservasi -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th>Nama Atraksi</th>
+            <th>Tanggal Kunjungan</th>
+            <th>Jumlah Tiket</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in reservasi %}
+          <tr>
+            <td>{{ res.nama_fasilitas }}</td>
+            <td>{{ res.tanggal_kunjungan }}</td>
+            <td>{{ res.jumlah_tiket }}</td>
+            <td>
+              {% if res.status == 'Terjadwal' %}
+                <span class="badge badge-success">{{ res.status }}</span>
+              {% else %}
+                <span class="badge badge-warning">{{ res.status }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'manajemen_atraksi:reservasi_edit' res.nama_fasilitas res.tanggal_kunjungan %}" class="btn btn-primary btn-sm">Edit</a>
+              <a href="{% url 'manajemen_atraksi:reservasi_delete' res.nama_fasilitas res.tanggal_kunjungan %}" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus reservasi ini?')">Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
