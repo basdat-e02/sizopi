@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
+  <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-6">
+
+    <div class="flex justify-between items-center">
+      <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">Data Atraksi</h1>
+      <a href="{% url 'manajemen_atraksi:atraksi_create' %}" class="text-blue-500 hover:underline">[+ Tambah Atraksi]</a>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="table-auto w-full text-sm text-left text-gray-800 dark:text-gray-100 border">
+        <thead class="bg-gray-200 dark:bg-gray-700 text-sm font-semibold">
+          <tr>
+            <th class="border px-4 py-2">Nama Atraksi</th>
+            <th class="border px-4 py-2">Lokasi</th>
+            <th class="border px-4 py-2">Kapasitas</th>
+            <th class="border px-4 py-2">Jadwal</th>
+            <th class="border px-4 py-2">Hewan yang Terlibat</th>
+            <th class="border px-4 py-2">Pelatih</th>
+            <th class="border px-4 py-2">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for atraksi in atraksi_list %}
+          <tr class="bg-white dark:bg-gray-800">
+            <td class="border px-4 py-2">{{ atraksi.nama }}</td>
+            <td class="border px-4 py-2">{{ atraksi.lokasi }}</td>
+            <td class="border px-4 py-2">{{ atraksi.kapasitas }} orang</td>
+            <td class="border px-4 py-2">{{ atraksi.jadwal }}</td>
+            <td class="border px-4 py-2">{{ atraksi.hewan }}</td>
+            <td class="border px-4 py-2">{{ atraksi.pelatih }}</td>
+            <td class="border px-4 py-2 space-x-2">
+                <a href="{% url 'manajemen_atraksi:atraksi_update' atraksi.nama %}" 
+                class="text-blue-500 hover:underline">[Edit]</a>
+             
+             <a href="{% url 'manajemen_atraksi:atraksi_delete' atraksi.nama %}" 
+                class="text-red-500 hover:underline"> [Hapus]</a>
+             
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

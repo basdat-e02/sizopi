@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-from dotenv import load_dotenv
 from pathlib import Path
 import os
 
@@ -49,6 +48,7 @@ INSTALLED_APPS = [
     'adopsi_manager',
     'manajemen_kesehatan',
     'perawatan_satwa',
+    'manajemen_atraksi',
 ]
 
 MIDDLEWARE = [
@@ -91,7 +91,6 @@ WSGI_APPLICATION = 'sizopi.wsgi.application'
 
 # use supabase if .env is there
 try:
-    load_dotenv()
 
     USER = os.getenv("user")
     PASSWORD = os.getenv("password")

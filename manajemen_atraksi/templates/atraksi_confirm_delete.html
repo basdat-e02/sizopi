@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12">
+  <div class="w-full max-w-2xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
+    <h1 class="text-xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">HAPUS ATRAKSI</h1>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="space-y-6">
+        <div>
+          <p class="text-lg font-medium text-gray-700 dark:text-gray-300">Apakah Anda yakin ingin menghapus atraksi ini?</p>
+        </div>
+
+        <div>
+          <p><strong>Nama Atraksi:</strong> {{ atraksi.nama }}</p>
+          <p><strong>Lokasi:</strong> {{ atraksi.lokasi }}</p>
+          <p><strong>Pelatih:</strong> {{ atraksi.pelatih }}</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-4 mt-8">
+        <a href="{% url 'manajemen_atraksi:atraksi_list' %}" class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold text-center">
+          <i class="bi bi-x-circle"></i> Tidak
+        </a>
+        <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-center">
+          <i class="bi bi-trash"></i> Ya, Hapus
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

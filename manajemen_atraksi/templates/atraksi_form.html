@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
+    <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-6">
+
+        <div class="flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">{{ action }} Atraksi</h1>
+        </div>
+
+        {% if error %}
+        <div class="text-red-500 bg-red-100 p-2 rounded-md">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="space-y-4">
+
+<!-- Nama Atraksi -->
+<div>
+    <label for="nama" class="block text-sm font-semibold text-white">Nama Atraksi</label>
+    <input type="text" name="nama" id="nama" class="bg-gray-700 text-white w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ atraksi.nama|default:'' }}" required>
+</div>
+
+<!-- Jadwal -->
+<div>
+    <label for="jadwal" class="block text-sm font-semibold text-white">Jadwal</label>
+    <input type="datetime-local" name="jadwal" id="jadwal" class="bg-gray-700 text-white w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ atraksi.jadwal|default:'' }}" required>
+</div>
+
+<!-- Kapasitas -->
+<div>
+    <label for="kapasitas" class="block text-sm font-semibold text-white">Kapasitas Maksimum</label>
+    <input type="number" name="kapasitas" id="kapasitas" class="bg-gray-700 text-white w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ atraksi.kapasitas|default:'' }}" required>
+</div>
+
+<!-- Lokasi -->
+<div>
+    <label for="lokasi" class="block text-sm font-semibold text-white">Lokasi</label>
+    <input type="text" name="lokasi" id="lokasi" class="bg-gray-700 text-white w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ atraksi.lokasi|default:'' }}" required>
+</div>
+
+<!-- Pelatih -->
+<div>
+    <label for="pelatih" class="block text-sm font-semibold text-white">Pelatih</label>
+    <select name="pelatih" id="pelatih" class="bg-gray-700 text-white w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        <option value="">-- Pilih Pelatih --</option>
+        {% for pelatih in pelatih_list %}
+        <option value="{{ pelatih.username }}" {% if atraksi and atraksi.pelatih == pelatih.username %}selected{% endif %}>
+            {{ pelatih.nama_depan }} {{ pelatih.nama_belakang }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+<!-- Hewan -->
+<div>
+    <label for="hewan" class="block text-sm font-semibold text-white">Hewan yang Terlibat</label>
+    <select name="hewan" id="hewan" class="bg-gray-700 text-white w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" multiple>
+        {% for hewan in hewan_list %}
+        <option value="{{ hewan.id }}" {% if atraksi and hewan.id in atraksi.hewan_terlibat %}selected{% endif %}>
+            {{ hewan.nama }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+
+                <div class="mt-6 flex justify-end">
+                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

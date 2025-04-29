@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include "navbar.html" %}
+  <div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
+    <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-6">
+
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ action }}</h2>
+
+      <form method="POST" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Dropdown Nama Atraksi -->
+        <div class="flex flex-col">
+          <label for="nama_atraksi" class="text-gray-700 dark:text-gray-200">Nama Atraksi</label>
+          <select name="nama_atraksi" class="mt-2 p-2 border rounded-md text-gray-800 dark:text-gray-100" required>
+            <option value="" disabled selected>Pilih Atraksi</option>
+            {% for atraksi in atraksi_list %}
+              <option value="{{ atraksi.nama }}" {% if atraksi.nama == reservasi.nama_atraksi %}selected{% endif %}>{{ atraksi.nama }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Isian Lokasi -->
+        <div class="flex flex-col">
+          <label for="lokasi" class="text-gray-700 dark:text-gray-200">Lokasi</label>
+          <input type="text" name="lokasi" value="{{ reservasi.lokasi }}" class="mt-2 p-2 border rounded-md text-gray-800 dark:text-gray-100" required>
+        </div>
+
+        <!-- Gabungan Tanggal dan Jam -->
+        <div class="flex flex-col">
+          <label for="tanggal_waktu" class="text-gray-700 dark:text-gray-200">Tanggal & Jam Kunjungan</label>
+          <input type="datetime-local" name="tanggal_waktu" value="{{ reservasi.tanggal_kunjungan|date:'Y-m-d\TH:i' }}" class="mt-2 p-2 border rounded-md text-gray-800 dark:text-gray-100" required>
+        </div>
+
+        <!-- Jumlah Tiket -->
+        <div class="flex flex-col">
+          <label for="jumlah_tiket" class="text-gray-700 dark:text-gray-200">Jumlah Tiket</label>
+          <input type="number" name="jumlah_tiket" value="{{ reservasi.jumlah_tiket }}" class="mt-2 p-2 border rounded-md text-gray-800 dark:text-gray-100" required min="1">
+        </div>
+
+        <!-- Status -->
+        <div class="flex flex-col">
+          <label for="status" class="text-gray-700 dark:text-gray-200">Status</label>
+          <select name="status" class="mt-2 p-2 border rounded-md text-gray-800 dark:text-gray-100" required>
+            <option value="Terjadwal" {% if reservasi.status == "Terjadwal" %}selected{% endif %}>Terjadwal</option>
+            <option value="Dibatalkan" {% if reservasi.status == "Dibatalkan" %}selected{% endif %}>Dibatalkan</option>
+            <option value="Selesai" {% if reservasi.status == "Selesai" %}selected{% endif %}>Selesai</option>
+          </select>
+        </div>
+
+        <!-- Tombol Submit -->
+        <div class="flex justify-center">
+          <button type="submit" class="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300">Perbarui Reservasi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
