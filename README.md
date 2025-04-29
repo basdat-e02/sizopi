@@ -12,13 +12,13 @@
 
 ## 🚀 Getting Started
 
-### ⚠️ Important Notes
-
+> ### ⚠️ Important Notes
+> 
+> 📄 *See `main/views.py` for additional development info.*
 > 🔁 **Use `python3` instead of `python`** on Unix-based systems (Mac/Linux).  
 > 💻 **Use `source env/bin/activate`** instead of `env\Scripts\activate` on Mac/Linux.  
-> 📦 *The `insert_function` command requires `.env` to be included beforehand.*
+> 📦 *The `insert_function` command requires `.env` to be included beforehand.* 
 
----
 
 ### Set Up Environment
 ```bash

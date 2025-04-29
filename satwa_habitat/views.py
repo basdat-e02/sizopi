@@ -2,7 +2,10 @@ from django.shortcuts import redirect, render
 from django.db import connection
 from django.urls import reverse
 from django.utils.dateparse import parse_date
+from main.views import allowed_roles, unauthenticated_user, login_required_custom  
 
+@login_required_custom
+@allowed_roles(["dokter hewan","penjaga hewan","staf admin",]) 
 def view_satwa(request):
     try:
         if request.method == 'POST' and request.POST.get('_method') == 'DELETE':
@@ -36,7 +39,8 @@ def view_satwa(request):
 
     return render(request, 'view_satwa.html', context)
 
-
+@login_required_custom
+@allowed_roles(["dokter hewan","penjaga hewan","staf admin",])
 def create_satwa(request):
     try:
         if request.method == 'POST':
@@ -78,6 +82,8 @@ def create_satwa(request):
     }
     return render(request, 'create_satwa.html', context)
 
+@login_required_custom
+@allowed_roles(["dokter hewan","penjaga hewan","staf admin",])
 def edit_satwa(request, uuid):
     try: 
         if request.method == 'POST':
@@ -129,6 +135,8 @@ def edit_satwa(request, uuid):
     }
     return render(request, 'edit_satwa.html', context)
 
+@login_required_custom
+@allowed_roles(["dokter hewan","penjaga hewan","staf admin",])
 def view_habitat(request):
     try:
         if request.method == 'POST' and request.POST.get('_method') == 'DELETE':
@@ -161,7 +169,8 @@ def view_habitat(request):
     }
     return render(request, 'view_habitat.html', context)
 
-
+@login_required_custom
+@allowed_roles(["penjaga hewan","staf admin",])
 def detail_habitat(request, nama):
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM get_habitat_by_name(%s)", [nama])
@@ -198,7 +207,8 @@ def detail_habitat(request, nama):
     }
     return render(request, 'detail_habitat.html', context)
 
-
+@login_required_custom
+@allowed_roles(["penjaga hewan","staf admin",])
 def create_habitat(request):
     try :
         if request.method == 'POST':
@@ -217,6 +227,8 @@ def create_habitat(request):
     context = {"role": "penjaga hewan"}
     return render(request, 'create_habitat.html', context)
 
+@login_required_custom
+@allowed_roles(["penjaga hewan","staf admin",])
 def edit_habitat(request, nama):
     try:
         if request.method == 'POST':
