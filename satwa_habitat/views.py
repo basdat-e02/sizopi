@@ -1,8 +1,9 @@
+from shlex import quote
 from django.shortcuts import redirect, render
 from django.db import connection
 from django.urls import reverse
 from django.utils.dateparse import parse_date
-from main.views import allowed_roles, unauthenticated_user, login_required_custom  
+from main.views import allowed_roles, get_user_role, unauthenticated_user, login_required_custom  
 
 @login_required_custom
 @allowed_roles(["dokter hewan","penjaga hewan","staf admin",]) 
@@ -83,27 +84,47 @@ def create_satwa(request):
     return render(request, 'create_satwa.html', context)
 
 @login_required_custom
-@allowed_roles(["dokter hewan","penjaga hewan","staf admin",])
+@allowed_roles(["dokter hewan", "penjaga hewan", "staf admin"])
 def edit_satwa(request, uuid):
-    try: 
+    try:
+        print("kucing")
         if request.method == 'POST':
-            nama = request.POST.get('nama')
-            spesies = request.POST.get('spesies')
-            asal = request.POST.get('asal')
-            tanggal_lahir = request.POST.get('tanggal_lahir') or None
-            status = request.POST.get('status_kesehatan')
-            habitat = request.POST.get('habitat')
-            foto = request.POST.get('foto')
+            nama           = request.POST.get('nama')
+            spesies        = request.POST.get('spesies')
+            asal           = request.POST.get('asal')
+            tanggal_lahir  = request.POST.get('tanggal_lahir') or None
+            status         = request.POST.get('status_kesehatan')
+            habitat        = request.POST.get('habitat')
+            foto           = request.POST.get('foto')
+            print("kucing")
 
             with connection.cursor() as cursor:
+                pgconn = cursor.connection          # ← psycopg2 connection
+                pgconn.notices.clear()              # bersihkan notice lama
+
                 cursor.execute("""
-                    SELECT update_hewan(%s, %s, %s, %s, %s, %s, %s, %s)
-                """, [uuid, nama, spesies, asal, tanggal_lahir, status, habitat, foto])
-            
-            return redirect('view_satwa')
+                    SELECT update_hewan(%s,%s,%s,%s,%s,%s,%s,%s)
+                """, [
+                    uuid, nama, spesies, asal,
+                    tanggal_lahir, status, habitat, foto
+                ])
+
+                # salin notice sebelum keluar dari blok WITH
+                notices = pgconn.notices[:]
+                pgconn.notices.clear()
+
+            if notices:
+                raw = notices[-1]                                 # ambil yang terakhir
+                notice_msg = raw.replace('NOTICE:', '').strip()   # rapikan
+            else:
+                notice_msg = 'Data satwa berhasil diperbarui.'
+
+            return redirect(f'/show_message/?msg={quote(notice_msg)}&type=success&next_url=view_satwa')
+
     except Exception as e:
-        return redirect(f'/show_message/?msg={str(e)}&type=error')
-    
+        print("bacot")
+        return redirect(f'/show_message/?msg={quote(str(e))}&type=error')
+
     nama_habitat_list = []
 
     with connection.cursor() as cursor:

@@ -1,7 +1,7 @@
 from shlex import quote
 import uuid
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, resolve_url
 from django.urls import reverse
 from django.contrib.auth import logout
 from functools import wraps
@@ -142,22 +142,28 @@ def get_user_role(username):
 #    - handle error & warning
 #
 #   how to use?
-#     return redirect(f'/show_message/?msg={message}&type=warning')
+#     - return redirect(f'/show_message/?msg={message}&type=warning')
+#           OR/ATAU
+#     - return redirect(f'/show_message/?msg={message}&type=success&next_url=view_satwa')
 def show_message(request):
-    type = request.GET.get("type", "info")
-    msg = request.GET.get("msg", "")
+    type_     = request.GET.get("type", "info")        # hindari shadowing kata bawaan 'type'
+    msg       = request.GET.get("msg", "")
+    next_raw  = request.GET.get("next_url")            # bisa None
+    next_url  = resolve_url(next_raw) if next_raw else ""
 
     colors = {
-        "success": ("green", "Berhasil"),
-        "error": ("red", "Gagal"),
+        "success": ("green",  "Berhasil"),
+        "error":   ("red",    "Gagal"),
         "warning": ("yellow", "Peringatan"),
     }
-    color, text = colors.get(type, ("gray", "Pesan"))
+    color, text = colors.get(type_, ("gray", "Pesan"))
 
     return render(request, "show_message.html", {
-        "message": msg,
-        "color": color,
-        "text": text
+        "message":  msg,
+        "color":    color,
+        "text":     text,
+        "next_url": next_url,
+        "type":     type_,        # ← kirim ke template juga
     })
 
 
@@ -193,21 +199,21 @@ def login_user(request):
 
         if username and password:
             # Call stored function login_user to authenticate
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM login_user(%s, %s)", [username, password])
-                user_data = cursor.fetchone()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT * FROM login_user(%s, %s)", [username, password])
+                    user_data = cursor.fetchone()              # hanya ada kalau login sukses
+            except Exception as e:                            # menangkap RAISE EXCEPTION
+                msg = quote(str(e))                           # “Username atau password salah …”
+                return redirect(f"{reverse('show_message')}?type=warning&msg={msg}")
 
             if user_data:
                 # ✅ Login success
                 request.session['username'] = user_data[0]  # username
                 request.session.set_expiry(None)  # No expiration
 
-                return redirect("dashboard")  # Redirect to dashboard
-
-            else:
-                # ❌ Username atau password salah -> redirect ke show_message
-                url = reverse('show_message') + "?type=warning&msg=Username atau Password salah."
-                return redirect(url)
+                message = f"Login Berhasil, Selamat Datang {user_data[0]}!"
+                return redirect(f'/show_message/?msg={message}&type=success&next_url=dashboard')
 
         else:
             # ❌ Username atau password kosong -> redirect ke show_message
@@ -258,11 +264,18 @@ def register_pengunjung(request):
                        VALUES (%s, %s, %s)''',
                     [username, address, birthdate]
                 )
-            # Redirect ke halaman login tanpa show_message
-            return redirect('login')
+            message = f"Register berhasil, selamat bergabung {username}!"
+            return redirect(f'/show_message/?msg={message}&type=success&next_url=login')
         except Exception as e:
+            connection.rollback()          # pastikan transaksi dibersihkan
+            # Trigger duplikasi username mengandung kalimat “ERROR: Username ...”
+            if 'ERROR: Username' in str(e):
+                msg_type = 'warning'       # tampilan kuning, bukan merah
+            else:
+                msg_type = 'error'
             msg = quote(str(e))
-            return redirect(f"{reverse('show_message')}?type=error&msg={msg}")
+            return redirect(f"{reverse('show_message')}?type={msg_type}&msg={msg}")
+
 
     return render(request, 'register_pengunjung.html', {'role': get_user_role(request.session.get('username'))})
 
@@ -314,10 +327,17 @@ def register_dokter_hewan(request):
                                VALUES (%s, %s)''',
                             [username, sp]
                         )
-            return redirect('login')
+            message = f"Register berhasil, selamat bergabung {username}!"
+            return redirect(f'/show_message/?msg={message}&type=success&next_url=login')
         except Exception as e:
+            connection.rollback()          # pastikan transaksi dibersihkan
+            # Trigger duplikasi username mengandung kalimat “ERROR: Username ...”
+            if 'ERROR: Username' in str(e):
+                msg_type = 'warning'       # tampilan kuning, bukan merah
+            else:
+                msg_type = 'error'
             msg = quote(str(e))
-            return redirect(f"{reverse('show_message')}?type=error&msg={msg}")
+            return redirect(f"{reverse('show_message')}?type={msg_type}&msg={msg}")
 
     return render(request, 'register_dokter_hewan.html', {'role': get_user_role(request.session.get('username'))})
 
@@ -367,16 +387,24 @@ def register_staff(request):
                     """,
                     [username, staff_id]
                 )
-            return redirect('login')
+            message = f"Register berhasil, selamat bergabung {username}!"
+            return redirect(f'/show_message/?msg={message}&type=success&next_url=login')
         except Exception as e:
+            connection.rollback()          # pastikan transaksi dibersihkan
+            # Trigger duplikasi username mengandung kalimat “ERROR: Username ...”
+            if 'ERROR: Username' in str(e):
+                msg_type = 'warning'       # tampilan kuning, bukan merah
+            else:
+                msg_type = 'error'
             msg = quote(str(e))
-            return redirect(f"{reverse('show_message')}?type=error&msg={msg}")
+            return redirect(f"{reverse('show_message')}?type={msg_type}&msg={msg}")
 
     return render(request, 'register_staff.html', {'role': get_user_role(request.session.get('username'))})
 
 def logout_user(request):
     request.session.flush()
-    return redirect('login')
+    message = f"Logout berhasil, sampai jumpa!"
+    return redirect(f'/show_message/?msg={message}&type=success&next_url=login')
 
 @login_required_custom   
 def dashboard(request):
@@ -586,7 +614,8 @@ def profile(request):
                             "INSERT INTO SPESIALISASI(username_SH, nama_spesialisasi) VALUES (%s, %s)",
                             [username, specs_other]
                         )
-            return redirect('profile')
+            message = f"Profile berhasil diperbarui!"
+            return redirect(f'/show_message/?msg={message}&type=success&next_url=profile')
 
         except Exception as e:
             msg = quote(str(e))
@@ -663,7 +692,8 @@ def change_password(request):
                     msg = quote('Password lama salah.')
                     return redirect(f"{reverse('show_message')}?type=warning&msg={msg}")
                 cursor.execute("UPDATE PENGGUNA SET password=%s WHERE username=%s", [new_pw1, username])
-            return redirect('change_password')
+            message = f"Password berhasil diperbarui!"
+            return redirect(f'/show_message/?msg={message}&type=success&next_url=profile')
         except Exception as e:
             msg = quote(str(e))
             return redirect(f"{reverse('show_message')}?type=error&msg={msg}")

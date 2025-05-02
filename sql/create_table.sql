@@ -1,7 +1,7 @@
 -- 1. Tabel PENGGUNA
 CREATE TABLE PENGGUNA (
   username        VARCHAR(50) PRIMARY KEY,
-  email           VARCHAR(100) NOT NULL,
+  email           VARCHAR(100) NOT NULL UNIQUE,
   password        VARCHAR(50)  NOT NULL,
   nama_depan      VARCHAR(50)  NOT NULL,
   nama_tengah     VARCHAR(50),
@@ -74,6 +74,16 @@ CREATE TABLE HEWAN (
   FOREIGN KEY (nama_habitat) REFERENCES HABITAT(nama)
 );
 
+-- 9.1 Tabel RIWAYAT SATWA : Terbuat ketika update hewan ter update (trigger)
+CREATE TABLE RIWAYAT_SATWA (
+    id_riwayat      BIGSERIAL PRIMARY KEY,
+    id_hewan        UUID        NOT NULL REFERENCES HEWAN(id) ON DELETE CASCADE,
+    kolom_diubah    VARCHAR(30) NOT NULL,     -- 'status_kesehatan' atau 'nama_habitat'
+    sebelum         VARCHAR(100),
+    sesudah         VARCHAR(100),
+    dicatat_pada    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 10. Tabel CATATAN_MEDIS
 CREATE TABLE CATATAN_MEDIS (
   id_hewan               UUID       NOT NULL,
@@ -90,8 +100,8 @@ CREATE TABLE CATATAN_MEDIS (
 
 -- 11. Tabel PAKAN
 CREATE TABLE PAKAN (
-  id_hewan    UUID       NOT NULL,
-  jadwal      TIMESTAMP  NOT NULL,
+  id_hewan    UUID        NOT NULL,
+  jadwal      TIMESTAMP    NOT NULL,
   jenis       VARCHAR(50) NOT NULL,
   jumlah      INT         NOT NULL,
   status      VARCHAR(50) NOT NULL,
@@ -102,9 +112,10 @@ CREATE TABLE PAKAN (
 -- 12. Tabel MEMBERI
 CREATE TABLE MEMBERI (
   id_hewan    UUID       PRIMARY KEY,
-  jadwal      TIMESTAMP  NOT NULL,
+  jadwal      TIMESTAMP,
   username_jh VARCHAR(50),
-  FOREIGN KEY (id_hewan)    REFERENCES HEWAN(id),
+  FOREIGN KEY (id_hewan)    REFERENCES PAKAN(id_hewan),
+  FOREIGN KEY (jadwal)    REFERENCES PAKAN(jadwal),
   FOREIGN KEY (username_jh) REFERENCES PENJAGA_HEWAN(username_jh)
 );
 
@@ -145,7 +156,7 @@ CREATE TABLE BERPARTISIPASI (
 CREATE TABLE JADWAL_PEMERIKSAAN_KESEHATAN (
   id_hewan                    UUID NOT NULL,
   tgl_pemeriksaan_selanjutnya DATE NOT NULL,
-  freq_pemeriksaan_rutin      INT  NOT NULL,
+  freq_pemeriksaan_rutin      INT  NOT NULL DEFAULT 3,
   PRIMARY KEY (id_hewan, tgl_pemeriksaan_selanjutnya),
   FOREIGN KEY (id_hewan) REFERENCES HEWAN(id)
 );

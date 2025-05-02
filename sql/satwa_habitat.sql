@@ -195,3 +195,59 @@ BEGIN
     DELETE FROM HEWAN WHERE id = p_id;
 END;
 $$ LANGUAGE plpgsql;
+
+
+/* Trigger function */
+CREATE OR REPLACE FUNCTION trg_check_duplicate_hewan()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM HEWAN
+        WHERE lower(nama)        = lower(NEW.nama)
+          AND lower(spesies)     = lower(NEW.spesies)
+          AND lower(asal_hewan)  = lower(NEW.asal_hewan)
+    ) THEN
+        RAISE EXCEPTION
+            'Data satwa atas nama “%”, spesies “%”, dan berasal dari “%” sudah terdaftar.',
+            NEW.nama, NEW.spesies, NEW.asal_hewan;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Trigger */
+DROP TRIGGER IF EXISTS check_duplicate_hewan ON HEWAN;
+CREATE TRIGGER check_duplicate_hewan
+BEFORE INSERT ON HEWAN
+FOR EACH ROW EXECUTE FUNCTION trg_check_duplicate_hewan();
+
+
+CREATE OR REPLACE FUNCTION trg_log_hewan_update()
+RETURNS TRIGGER AS $$
+DECLARE
+    msg TEXT;
+BEGIN
+    /* ----- status_kesehatan ----- */
+    INSERT INTO RIWAYAT_SATWA (id_hewan, kolom_diubah, sebelum, sesudah)
+    VALUES (NEW.id, 'status_kesehatan', OLD.status_kesehatan, NEW.status_kesehatan);
+
+    /* ----- nama_habitat ----- */
+    INSERT INTO RIWAYAT_SATWA (id_hewan, kolom_diubah, sebelum, sesudah)
+    VALUES (NEW.id, 'nama_habitat', OLD.nama_habitat, NEW.nama_habitat);
+
+    /* Pesan sukses – selalu muncul, walau sebelum=sesudah */
+    msg := format(
+        'SUKSES: Riwayat perubahan status kesehatan dari “%s” menjadi “%s” atau habitat dari “%s” menjadi “%s” telah dicatat.',
+        COALESCE(OLD.status_kesehatan,'-'), COALESCE(NEW.status_kesehatan,'-'),
+        COALESCE(OLD.nama_habitat,'-'),     COALESCE(NEW.nama_habitat,'-')
+    );
+    RAISE NOTICE '%', msg;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS log_hewan_update ON HEWAN;
+CREATE TRIGGER log_hewan_update
+AFTER UPDATE OF status_kesehatan, nama_habitat ON HEWAN
+FOR EACH ROW EXECUTE FUNCTION trg_log_hewan_update();

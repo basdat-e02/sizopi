@@ -21,10 +21,17 @@
       <p class="text-center text-gray-800 dark:text-gray-200 font-medium break-words">{{ message }}</p>
 
       <div class="text-center">
-        <button onclick="history.back()"
-                class="mt-4 px-4 py-2 font-semibold text-white bg-{{ color }}-600 hover:bg-{{ color }}-700 rounded-lg">
-          Kembali
-        </button>
+        {% if type == 'success' and next_url %}
+          <a href="{{ next_url }}"
+             class="mt-4 inline-block px-4 py-2 font-semibold text-white bg-{{ color }}-600 hover:bg-{{ color }}-700 rounded-lg">
+            OK
+          </a>
+        {% else %}
+          <button onclick="history.back()"
+                  class="mt-4 px-4 py-2 font-semibold text-white bg-{{ color }}-600 hover:bg-{{ color }}-700 rounded-lg">
+            Kembali
+          </button>
+        {% endif %}
       </div>
     </div>
   </div>
