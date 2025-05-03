@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-1yoyc-og072mxv6sgvoy+a8!mv=v!zxm-(1x&w!vi&p=4h3uw7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", '10.0.2.2', ]
+ALLOWED_HOSTS = ['sizopi-production.up.railway.app',"localhost", "127.0.0.1", '10.0.2.2', ]
 
 
 # Application definition
@@ -191,6 +191,7 @@ CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE = 'None'
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://sizopi-production.up.railway.app",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
     "http://10.0.2.2:8000",
