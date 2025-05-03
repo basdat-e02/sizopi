@@ -1,7 +1,8 @@
-# SIZOPI (Sistem Informasi Zoo Pintar)
+# SIZOPI (Sistem Informasi Zoo Pintar) [![SIZOPI Production Status](https://img.shields.io/website?url=https%3A%2F%2Fsizopi-production.up.railway.app&label=Live%20Status&style=flat-square&logo=django)](https://sizopi-production.up.railway.app)
 
-## 🌐 Deployment
-🔗 [SIZOPI Live App](https://sizopi-production.up.railway.app/)
+🔗 **Production URL** : https://sizopi-production.up.railway.app
+
+
 
 ## 📋 Daftar Fitur dan Kontributor
 
