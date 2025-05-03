@@ -1,5 +1,8 @@
 # SIZOPI (Sistem Informasi Zoo Pintar)
 
+## 🌐 Deployment
+🔗 [SIZOPI Live App](https://sizopi-production.up.railway.app/)
+
 ## 📋 Daftar Fitur dan Kontributor
 
 | Warna Fitur | Dikerjakan Oleh                         |
