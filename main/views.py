@@ -221,7 +221,7 @@ def login_user(request):
             return redirect(url)
 
     # GET request: tampilkan halaman login
-    return render(request, "login.html", {"role": "unknown"})
+    return render(request, "login.html", {"role": get_user_role(request.session.get('username'))})
 
 @unauthenticated_user
 def choose_register_role(request):
@@ -253,19 +253,15 @@ def register_pengunjung(request):
             return redirect(f"{reverse('show_message')}?type=warning&msg={msg}")
 
         try:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    '''INSERT INTO PENGGUNA(username, email, password, nama_depan, nama_tengah, nama_belakang, no_telepon)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s)''',
-                    [username, email, password1, first_name, middle_name or None, last_name, phone]
+            with connection.cursor() as c:
+                c.execute(
+                    "SELECT register_pengunjung(%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    [username, email, password1,
+                    first_name, middle_name or None, last_name, phone,
+                    address, birthdate]
                 )
-                cursor.execute(
-                    '''INSERT INTO PENGUNJUNG(username_P, alamat, tgl_lahir)
-                       VALUES (%s, %s, %s)''',
-                    [username, address, birthdate]
-                )
-            message = f"Register berhasil, selamat bergabung {username}!"
-            return redirect(f'/show_message/?msg={message}&type=success&next_url=login')
+            msg = quote(f"Register berhasil, selamat bergabung {username}!")
+            return redirect(f'{reverse("show_message")}?type=success&msg={msg}&next_url=login')
         except Exception as e:
             connection.rollback()          # pastikan transaksi dibersihkan
             # Trigger duplikasi username mengandung kalimat “ERROR: Username ...”
@@ -301,32 +297,20 @@ def register_dokter_hewan(request):
         if password1 != password2:
             msg = quote('Password dan konfirmasi tidak cocok.')
             return redirect(f"{reverse('show_message')}?type=warning&msg={msg}")
+        
+        sp_array = spesialisasi_list[:]          # Django list → Python list
+        if 'Lainnya' in sp_array and spesialisasi_lain:
+            sp_array.remove('Lainnya')
+            sp_array.append(spesialisasi_lain)
 
         try:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    '''INSERT INTO PENGGUNA(username, email, password, nama_depan, nama_tengah, nama_belakang, no_telepon)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s)''',
-                    [username, email, password1, first_name, middle_name or None, last_name, phone]
+            with connection.cursor() as c:
+                c.execute(
+                    "SELECT register_dokter_hewan(%s,%s,%s,%s,%s,%s,%s,%s,%s::text[])",
+                    [username, email, password1,
+                    first_name, middle_name or None, last_name, phone,
+                    certification, sp_array]
                 )
-                cursor.execute(
-                    '''INSERT INTO DOKTER_HEWAN(username_DH, no_STR)
-                       VALUES (%s, %s)''',
-                    [username, certification]
-                )
-                for sp in spesialisasi_list:
-                    if sp == 'Lainnya' and spesialisasi_lain:
-                        cursor.execute(
-                            '''INSERT INTO SPESIALISASI(username_SH, nama_spesialisasi)
-                               VALUES (%s, %s)''',
-                            [username, spesialisasi_lain]
-                        )
-                    elif sp != 'Lainnya':
-                        cursor.execute(
-                            '''INSERT INTO SPESIALISASI(username_SH, nama_spesialisasi)
-                               VALUES (%s, %s)''',
-                            [username, sp]
-                        )
             message = f"Register berhasil, selamat bergabung {username}!"
             return redirect(f'/show_message/?msg={message}&type=success&next_url=login')
         except Exception as e:
@@ -374,18 +358,12 @@ def register_staff(request):
             return redirect(f"{reverse('show_message')}?type=warning&msg={msg}")
 
         try:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    '''INSERT INTO PENGGUNA(username, email, password, nama_depan, nama_tengah, nama_belakang, no_telepon)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s)''',
-                    [username, email, password1, first_name, middle_name or None, last_name, phone]
-                )
-                cursor.execute(
-                    f"""
-                    INSERT INTO {table}(username_{ 'jh' if role_code=='PJH' else ('sa' if role_code=='ADM' else 'lh') }, id_staf)
-                    VALUES (%s, %s)
-                    """,
-                    [username, staff_id]
+            with connection.cursor() as c:
+                c.execute(
+                    "SELECT register_staff(%s,%s,%s,%s,%s,%s,%s,%s)",
+                    [username, email, password1,
+                    first_name, middle_name or None, last_name, phone,
+                    role_code]
                 )
             message = f"Register berhasil, selamat bergabung {username}!"
             return redirect(f'/show_message/?msg={message}&type=success&next_url=login')

@@ -34,7 +34,7 @@ def view_satwa(request):
         })
 
     context = {
-        "role": "penjaga hewan",
+        "role": get_user_role(request.session.get('username')),
         "satwa_list": satwa_list,
     }
 
@@ -78,7 +78,7 @@ def create_satwa(request):
         nama_habitat_list.append(habitat[0])
 
     context = {
-        "role": "penjaga hewan",
+        "role": get_user_role(request.session.get('username')),
         'nama_habitat_list': nama_habitat_list,
     }
     return render(request, 'create_satwa.html', context)
@@ -87,7 +87,6 @@ def create_satwa(request):
 @allowed_roles(["dokter hewan", "penjaga hewan", "staf admin"])
 def edit_satwa(request, uuid):
     try:
-        print("kucing")
         if request.method == 'POST':
             nama           = request.POST.get('nama')
             spesies        = request.POST.get('spesies')
@@ -96,7 +95,6 @@ def edit_satwa(request, uuid):
             status         = request.POST.get('status_kesehatan')
             habitat        = request.POST.get('habitat')
             foto           = request.POST.get('foto')
-            print("kucing")
 
             with connection.cursor() as cursor:
                 pgconn = cursor.connection          # ← psycopg2 connection
@@ -122,7 +120,6 @@ def edit_satwa(request, uuid):
             return redirect(f'/show_message/?msg={quote(notice_msg)}&type=success&next_url=view_satwa')
 
     except Exception as e:
-        print("bacot")
         return redirect(f'/show_message/?msg={quote(str(e))}&type=error')
 
     nama_habitat_list = []
@@ -150,14 +147,14 @@ def edit_satwa(request, uuid):
     }
 
     context = {
-        "role": "penjaga hewan",
+        "role": get_user_role(request.session.get('username')),
         'satwa' : hewan,
         'nama_habitat_list' : nama_habitat_list,
     }
     return render(request, 'edit_satwa.html', context)
 
 @login_required_custom
-@allowed_roles(["dokter hewan","penjaga hewan","staf admin",])
+@allowed_roles(["penjaga hewan","staf admin",])
 def view_habitat(request):
     try:
         if request.method == 'POST' and request.POST.get('_method') == 'DELETE':
@@ -185,7 +182,7 @@ def view_habitat(request):
         )
 
     context = {
-        "role": "penjaga hewan",
+        "role": get_user_role(request.session.get('username')),
         "habitat_list": habitat_list
     }
     return render(request, 'view_habitat.html', context)
@@ -222,7 +219,7 @@ def detail_habitat(request, nama):
 
 
     context = {
-        "role": "penjaga hewan",
+        "role": get_user_role(request.session.get('username')),
         "habitat": habitat,
         "hewan_list": hewan_list
     }
@@ -245,7 +242,7 @@ def create_habitat(request):
     except Exception as e:
         return redirect(f'/show_message/?msg={str(e)}&type=error')
 
-    context = {"role": "penjaga hewan"}
+    context = {"role": get_user_role(request.session.get('username'))}
     return render(request, 'create_habitat.html', context)
 
 @login_required_custom
@@ -279,7 +276,7 @@ def edit_habitat(request, nama):
     }
 
     context = {
-        "role": "penjaga hewan",
+        "role": get_user_role(request.session.get('username')),
         "habitat": habitat,
     }
     return render(request, 'edit_habitat.html', context)
