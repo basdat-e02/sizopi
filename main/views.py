@@ -205,7 +205,7 @@ def login_user(request):
                     user_data = cursor.fetchone()              # hanya ada kalau login sukses
             except Exception as e:                            # menangkap RAISE EXCEPTION
                 msg = quote(str(e))                           # “Username atau password salah …”
-                return redirect(f"{reverse('show_message')}?type=warning&msg={msg}")
+                return redirect(f"{reverse('show_message')}?type=error&msg={msg}")
 
             if user_data:
                 # ✅ Login success
@@ -668,12 +668,12 @@ def change_password(request):
                 cursor.execute("SELECT * FROM login_user(%s, %s)", [username, old_pw])
                 if not cursor.fetchone():
                     msg = quote('Password lama salah.')
-                    return redirect(f"{reverse('show_message')}?type=warning&msg={msg}")
+                    return redirect(f"{reverse('show_message')}?type=error&msg={msg}")
                 cursor.execute("UPDATE PENGGUNA SET password=%s WHERE username=%s", [new_pw1, username])
             message = f"Password berhasil diperbarui!"
             return redirect(f'/show_message/?msg={message}&type=success&next_url=profile')
         except Exception as e:
-            msg = quote(str(e))
+            msg = quote('Password lama salah')
             return redirect(f"{reverse('show_message')}?type=error&msg={msg}")
 
     return render(request, 'change_password.html', {'role': get_user_role(username)})

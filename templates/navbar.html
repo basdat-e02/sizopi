@@ -28,10 +28,13 @@
        {# ============== MENU SPESIFIK ROLE ============= #}
        {% if role == "dokter hewan" %}
          <li><a class="nav-link">Rekam Medis</a></li>
+         <li><a href="{% url 'view_satwa' %}">Data Satwa</a></li>
 
  
        {% elif role == "penjaga hewan" %}
          <li><a class="nav-link">Catatan Perawatan</a></li>
+         <li><a href="{% url 'view_satwa' %}">Data Satwa</a></li>
+         <li><a href="{% url 'view_habitat' %}">Data Habitat</a></li>
  
        {% elif role == "staf admin" %}
          <li><a class="nav-link">Kelola Pengunjung</a></li>
@@ -40,6 +43,8 @@
          <li><a class="nav-link">Kelola Atraksi</a></li>
          <li><a class="nav-link">Kelola Wahana</a></li>
          <li><a class="nav-link">Kelola Reservasi</a>
+        <li><a href="{% url 'view_satwa' %}">Data Satwa</a></li>
+        <li><a href="{% url 'view_habitat' %}">Data Habitat</a></li>
  
        {% elif role == "pelatih pertunjukan" %}
          <li><a class="nav-link">Jadwal Pertunjukan</a></li>

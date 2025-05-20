@@ -9,12 +9,29 @@
 
   <div class="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
     <div class="w-full max-w-md p-6 space-y-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-{{ color }}-400">
-      <div class="flex items-center justify-center">
-        <svg class="w-8 h-8 text-{{ color }}-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2l4 -4M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10z" />
-        </svg>
+      <div class="flex items-center justify-center space-x-2">
+        {% if type == 'success' %}
+          <!-- Check Circle Icon -->
+          <svg class="w-8 h-8 text-{{ color }}-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2l4-4M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+          </svg>
+        {% elif type == 'warning' %}
+          <!-- Exclamation Triangle Icon -->
+          <svg class="w-8 h-8 text-{{ color }}-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10.29 3.86L1.82 18a1 1 0 0 0 .86 1.5h18.64a1 1 0 0 0 .86-1.5L13.71 3.86a1 1 0 0 0-1.72 0zM12 9v4m0 4h.01" />
+          </svg>
+        {% elif type == 'error' %}
+          <!-- X Circle Icon -->
+          <svg class="w-8 h-8 text-{{ color }}-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+          </svg>
+        {% endif %}
         <h2 class="text-xl font-bold text-{{ color }}-700 dark:text-{{ color }}-300">{{ text }}</h2>
       </div>
 
