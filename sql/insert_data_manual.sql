@@ -266,22 +266,30 @@ INSERT INTO catatan_medis VALUES ('055df7d4-9239-46f8-9a10-d84ee67303cb','user51
 	('41c132a8-d31d-4529-a191-f4a5cc039820','user59','2023-05-16 00:00:00','Diagnosis 9','Pengobatan 9','Membaik','Catatan 9'),
 	('42956600-9a1b-42cf-b694-e0e9925ed8d5','user60','2023-05-31 00:00:00','Diagnosis 10','Pengobatan 10','Stabil','Catatan 10');
 
-INSERT INTO pakan VALUES ('055df7d4-9239-46f8-9a10-d84ee67303cb','2023-03-01 09:00:00','Sayuran',5,'Selesai'),
-	('0af43318-6b72-4163-b26a-9495eee901ff','2023-03-01 10:00:00','Buah',10,'Terjadwal'),
-	('15f45166-175a-426d-bbdb-e87ec8d29120','2023-03-01 11:00:00','Daging',15,'Selesai'),
-	('168bbbd3-842d-4650-a48c-7e3e6b5ebb34','2023-03-01 12:00:00','Sayuran',20,'Terjadwal'),
-	('22f5ab5c-0dc8-461d-bbd3-55ee68976d56','2023-03-01 13:00:00','Buah',25,'Selesai');
+INSERT INTO PAKAN (id_hewan, jadwal, jenis, jumlah, status) VALUES
+	('055df7d4-9239-46f8-9a10-d84ee67303cb', '2023-03-01 09:00:00', 'Sayuran', 5, 'Selesai'),
+	('0af43318-6b72-4163-b26a-9495eee901ff', '2023-03-01 10:00:00', 'Buah', 10, 'Terjadwal'),
+	('15f45166-175a-426d-bbdb-e87ec8d29120', '2023-03-01 11:00:00', 'Daging', 15, 'Selesai'),
+	('168bbbd3-842d-4650-a48c-7e3e6b5ebb34', '2023-03-01 12:00:00', 'Sayuran', 20, 'Terjadwal'),
+	('22f5ab5c-0dc8-461d-bbd3-55ee68976d56', '2023-03-01 13:00:00', 'Buah', 25, 'Selesai'),
+	('055df7d4-9239-46f8-9a10-d84ee67303cb', '2023-03-01 14:00:00', 'Daging', 30, 'Terjadwal'),
+	('0af43318-6b72-4163-b26a-9495eee901ff', '2023-03-01 15:00:00', 'Sayuran', 35, 'Selesai'),
+	('15f45166-175a-426d-bbdb-e87ec8d29120', '2023-03-01 16:00:00', 'Buah', 40, 'Terjadwal'),
+	('168bbbd3-842d-4650-a48c-7e3e6b5ebb34', '2023-03-01 17:00:00', 'Daging', 45, 'Selesai'),
+	('22f5ab5c-0dc8-461d-bbd3-55ee68976d56', '2023-03-01 18:00:00', 'Sayuran', 50, 'Terjadwal');
 
-INSERT INTO memberi VALUES ('055df7d4-9239-46f8-9a10-d84ee67303cb','2023-03-01 09:00:00','user66'),
-	('0af43318-6b72-4163-b26a-9495eee901ff','2023-03-01 10:00:00','user67'),
-	('15f45166-175a-426d-bbdb-e87ec8d29120','2023-03-01 11:00:00','user68'),
-	('168bbbd3-842d-4650-a48c-7e3e6b5ebb34','2023-03-01 12:00:00','user69'),
-	('22f5ab5c-0dc8-461d-bbd3-55ee68976d56','2023-03-01 13:00:00','user70'),
-	('26b823c1-4bc4-44b7-afce-fa7c9e5eb2fc','2023-03-01 14:00:00','user71'),
-	('33c9fb51-70a7-4154-9bbc-058eb6d53947','2023-03-01 15:00:00','user72'),
-	('379e472c-e7f4-4dcd-9d58-04a39bf919e5','2023-03-01 16:00:00','user73'),
-	('41c132a8-d31d-4529-a191-f4a5cc039820','2023-03-01 17:00:00','user74'),
-	('42956600-9a1b-42cf-b694-e0e9925ed8d5','2023-03-01 18:00:00','user75');
+
+INSERT INTO MEMBERI (id_hewan, jadwal, username_jh) VALUES
+	('055df7d4-9239-46f8-9a10-d84ee67303cb', '2023-03-01 09:00:00', 'penjaga1'),
+	('0af43318-6b72-4163-b26a-9495eee901ff', '2023-03-01 10:00:00', 'penjaga2'),
+	('15f45166-175a-426d-bbdb-e87ec8d29120', '2023-03-01 11:00:00', 'penjaga3'),
+	('168bbbd3-842d-4650-a48c-7e3e6b5ebb34', '2023-03-01 12:00:00', 'penjaga4'),
+	('22f5ab5c-0dc8-461d-bbd3-55ee68976d56', '2023-03-01 13:00:00', 'penjaga5'),
+	('055df7d4-9239-46f8-9a10-d84ee67303cb', '2023-03-01 14:00:00', 'penjaga6'),
+	('0af43318-6b72-4163-b26a-9495eee901ff', '2023-03-01 15:00:00', 'penjaga7'),
+	('15f45166-175a-426d-bbdb-e87ec8d29120', '2023-03-01 16:00:00', 'penjaga8'),
+	('168bbbd3-842d-4650-a48c-7e3e6b5ebb34', '2023-03-01 17:00:00', 'penjaga9'),
+	('22f5ab5c-0dc8-461d-bbd3-55ee68976d56', '2023-03-01 18:00:00', 'penjaga10');
 
 INSERT INTO fasilitas VALUES ('Safari Singa Liar','2023-03-01 10:00:00',50),
 	('Akrobat Lumba-lumba','2023-03-01 11:00:00',100),

@@ -114,8 +114,7 @@ CREATE TABLE MEMBERI (
   id_hewan    UUID       PRIMARY KEY,
   jadwal      TIMESTAMP,
   username_jh VARCHAR(50),
-  FOREIGN KEY (id_hewan)    REFERENCES PAKAN(id_hewan),
-  FOREIGN KEY (jadwal)    REFERENCES PAKAN(jadwal),
+  FOREIGN KEY (id_hewan, jadwal)    REFERENCES PAKAN(id_hewan, jadwal),
   FOREIGN KEY (username_jh) REFERENCES PENJAGA_HEWAN(username_jh)
 );
 
