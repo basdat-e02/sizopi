@@ -66,4 +66,4 @@ Berikut beberapa akun yang dapat digunakan untuk pengujian fitur login dan dashb
 | Pelatih Pertunjukan    | user76    | password76  |
 | Staf Administrasi      | user86    | password86  |
 
-Dengan data di atas, Anda bisa langsung menguji alur login, tampilan dashboard, dan pembatasan akses berdasarkan role.
+Dengan data di atas, Anda bisa langsung menguji alur login, tampilan dashboard, dan pembatasan akses berdasarkan role..
