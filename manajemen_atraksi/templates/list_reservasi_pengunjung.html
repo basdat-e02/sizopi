@@ -41,13 +41,14 @@
            class="text-yellow-400 hover:underline">
            [Edit]
         </a>
-        <a href="#" 
-           data-nama="{{ item.0 }}" 
-           data-tanggal="{{ item.1|date:"Y-m-d" }}"
-           onclick="bukaModal(this.dataset.nama, this.dataset.tanggal)" 
-           class="text-red-400 hover:underline">
-           [Batalkan]
-        </a>
+<a href="#"
+   data-nama="{{ item.0 }}"
+   data-tanggal="{{ item.5|date:'Y-m-d' }}"
+   onclick="console.log('DATA:', this.dataset.nama, this.dataset.tanggal); bukaModal(this.dataset.nama, this.dataset.tanggal)"
+   class="text-red-400 hover:underline">
+   [Batalkan]
+</a>
+
     {% else %}
         <span class="text-gray-500">-</span>
     {% endif %}
@@ -126,7 +127,7 @@
     const modal = document.getElementById('batalModal');
     const form = document.getElementById('batalForm');
     const message = document.getElementById('modalMessage');
-    const url = `/reservasi/batalkan/${encodeURIComponent(namaFasilitas)}/${tanggal}/`;
+    const url = `/reservasi/batalkan/${encodeURIComponent(namaFasilitas)}/${encodeURIComponent(tanggal)}/`;
     form.action = url;
     message.innerHTML = `Apakah kamu yakin ingin membatalkan reservasi untuk <strong>${namaFasilitas}</strong> pada <strong>${tanggal}</strong>?`;
     modal.classList.remove('hidden');

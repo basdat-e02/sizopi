@@ -593,35 +593,32 @@ def edit_reservasi(request, nama_fasilitas, tanggal):
 
 
 @login_required_custom
-@allowed_roles(['pengunjung','pengunjung_adopter'])
+@allowed_roles(['pengunjung', 'pengunjung_adopter'])
+@transaction.atomic
 def update_reservasi(request):
     try:
         if request.method == "POST":
             username = request.session.get("username")
             old_fasilitas = request.POST.get("old_fasilitas", "").strip()
-            old_tanggal = request.POST.get("old_tanggal", "").strip()
+            old_tanggal_str = request.POST.get("old_tanggal", "").strip()
             new_fasilitas = request.POST.get("nama_fasilitas", "").strip()
             new_tanggal = parse_date(request.POST.get("tanggal_kunjungan", ""))
             new_jumlah = request.POST.get("jumlah_tiket", "")
 
-            if not (old_fasilitas and old_tanggal and new_fasilitas and new_tanggal and new_jumlah):
+            if not (old_fasilitas and old_tanggal_str and new_fasilitas and new_tanggal and new_jumlah):
                 return redirect('manajemen_atraksi:list_reservasi_pengunjung')
 
             new_jumlah = int(new_jumlah)
+            old_tanggal = parse_date(old_tanggal_str)
 
-            with connection.cursor() as cursor:
-                # Simpan dulu reservasi baru ke tabel temporer (bisa juga dummy insert rollback)
-                try:
-                    cursor.execute("""
-                        INSERT INTO RESERVASI (username_p, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status)
-                        VALUES (%s, %s, %s, %s, 'Pending')
-                    """, [username, new_fasilitas, new_tanggal, new_jumlah])
-                except DatabaseError as e:
-                    msg = str(e).splitlines()[0]
-                    encoded_msg = quote(msg)
-                    return redirect(f'/show_message/?msg={encoded_msg}&type=error&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+            with transaction.atomic(), connection.cursor() as cursor:
+                # INSERT reservasi baru
+                cursor.execute("""
+                    INSERT INTO RESERVASI (username_p, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status)
+                    VALUES (%s, %s, %s, %s, 'Pending')
+                """, [username, new_fasilitas, new_tanggal, new_jumlah])
 
-                # Kalau berhasil insert → hapus yang lama
+                # DELETE reservasi lama
                 cursor.execute("""
                     DELETE FROM RESERVASI
                     WHERE username_p = %s AND nama_fasilitas = %s AND tanggal_kunjungan = %s
@@ -634,6 +631,7 @@ def update_reservasi(request):
         encoded_msg = quote(msg)
         return redirect(f'/show_message/?msg={encoded_msg}&type=error&next_url=manajemen_atraksi:list_reservasi_pengunjung')
 
+
 @login_required_custom
 @allowed_roles(['pengunjung','pengunjung_adopter'])
 def konfirmasi_batal(request, nama_fasilitas, tanggal):
@@ -645,22 +643,33 @@ def konfirmasi_batal(request, nama_fasilitas, tanggal):
         "tanggal": tanggal,
     })
     
+
+
 @login_required_custom
 @allowed_roles(['pengunjung','pengunjung_adopter'])
+@transaction.atomic
 def batalkan_reservasi(request, nama_fasilitas, tanggal):
     if request.method == "POST":
         username = request.session.get("username")
         tanggal_parsed = parse_date(tanggal)
+        nama_fasilitas_decoded = unquote(nama_fasilitas)  # ✅ decode dari URL ke teks biasa
+
+        print("🧪 UPDATE PARAMS:", username, nama_fasilitas_decoded, tanggal_parsed)
 
         with connection.cursor() as cursor:
             cursor.execute("""
                 UPDATE RESERVASI
                 SET status = 'Dibatalkan'
-                WHERE username_p = %s AND nama_fasilitas = %s AND tanggal_kunjungan = %s
-            """, [username, nama_fasilitas, tanggal_parsed])
+                WHERE username_p = %s
+                  AND nama_fasilitas = %s
+                  AND tanggal_kunjungan = %s
+            """, [username, nama_fasilitas_decoded, tanggal_parsed])
+            print("🔁 Jumlah baris diubah:", cursor.rowcount)
 
         return redirect('/show_message/?msg=Reservasi berhasil dibatalkan&type=success&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+    
     return redirect('/show_message/?msg=Metode tidak valid&type=error&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+
 
 @login_required_custom
 @allowed_roles(['pengunjung','pengunjung_adopter'])
