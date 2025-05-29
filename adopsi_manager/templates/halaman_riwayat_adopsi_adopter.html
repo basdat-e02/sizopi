@@ -1,26 +1,42 @@
 {% extends "base.html" %}
 {% load humanize %}
-{% block meta %}<title>Riwayat Adopsi {{ adopter }}</title>{% endblock meta %}
+{% block meta %}
+<title>Riwayat Adopsi {{ contact.nama }}</title>
+{% endblock meta %}
+
 {% block content %}
 {% include "navbar.html" %}
 
 <div class="min-h-screen py-12 px-6 bg-gray-100 dark:bg-gray-900">
   <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-    <a href="{% url 'daftar_adopter' %}" class="text-blue-500 hover:underline mb-4 inline-block">&larr; Kembali</a>
-    <h1 class="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Riwayat Adopsi</h1>
 
-    <p class="text-gray-700 dark:text-gray-300"><strong>Nama Adopter:</strong> {{ contact.nama }}</p>
-    <p class="text-gray-700 dark:text-gray-300"><strong>Alamat:</strong> {{ contact.alamat }}</p>
-    <p class="text-gray-700 dark:text-gray-300 mb-6"><strong>Kontak:</strong> {{ contact.no_telepon }}</p>
+    <a href="{% url 'daftar_adopter' %}"
+       class="text-blue-500 hover:underline mb-4 inline-block">
+       &larr; Kembali
+    </a>
+
+    <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+      Riwayat Adopsi
+    </h1>
+
+    <p class="text-gray-700 dark:text-gray-300">
+      <strong>Nama Adopter:</strong> {{ contact.nama }}
+    </p>
+    <p class="text-gray-700 dark:text-gray-300">
+      <strong>Alamat:</strong> {{ contact.alamat }}
+    </p>
+    <p class="text-gray-700 dark:text-gray-300 mb-6">
+      <strong>Kontak:</strong> {{ contact.no_telepon }}
+    </p>
 
     <table class="w-full table-auto text-sm text-gray-800 dark:text-gray-100 border">
       <thead class="bg-gray-200 dark:bg-gray-700 font-semibold">
         <tr>
           <th class="border px-4 py-2">Nama Hewan</th>
           <th class="border px-4 py-2">Jenis Hewan</th>
-          <th class="border px-4 py-2">Mulai</th>
-          <th class="border px-4 py-2">Akhir</th>
-          <th class="border px-4 py-2">Kontribusi</th>
+          <th class="border px-4 py-2">Tanggal Mulai</th>
+          <th class="border px-4 py-2">Tanggal Akhir</th>
+          <th class="border px-4 py-2">Nominal Kontribusi</th>
           <th class="border px-4 py-2">Aksi</th>
         </tr>
       </thead>
@@ -32,12 +48,27 @@
           <td class="border px-4 py-2">{{ r.tgl_mulai }}</td>
           <td class="border px-4 py-2">{{ r.tgl_berhenti }}</td>
           <td class="border px-4 py-2">Rp{{ r.kontribusi|intcomma }}</td>
-          <td class="border px-4 py-2">
-            {% if r.tgl_berhenti < today %}
-              <a href="#" class="text-red-500 hover:underline">Hapus</a>
+          <td class="border px-4 py-2 text-center">
+            {% if r.boleh_hapus %}
+              <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="id_hewan"  value="{{ r.id_hewan }}">
+                <input type="hidden" name="tgl_mulai" value="{{ r.tgl_mulai }}">
+                <button type="submit"
+                        class="text-red-500 hover:underline"
+                        onclick="return confirm('Hapus data adopsi ini?');">
+                  Hapus
+                </button>
+              </form>
             {% else %}
               <span class="text-gray-500">Sedang Berlangsung</span>
             {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="border px-4 py-4 text-center">
+            Tidak ada data.
           </td>
         </tr>
         {% endfor %}

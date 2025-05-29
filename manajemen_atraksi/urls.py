@@ -17,13 +17,19 @@ urlpatterns = [
     path('wahana/hapus/<str:nama>/', views.wahana_delete, name='wahana_delete'),
 
 
-    path('reservasi/<str:role>/', views.reservasi_list, name='reservasi_list'),
+    # Reservasi URLs
+    path('reservasi/', views.list_reservasi_pengunjung, name='list_reservasi_pengunjung'),
+    path('reservasi/form/', views.form_reservasi, name='form_reservasi'),
+    path('reservasi/simpan/', views.simpan_reservasi, name='simpan_reservasi'),
+    path('reservasi/batalkan/<str:nama_fasilitas>/<str:tanggal>/', views.batalkan_reservasi, name='batalkan_reservasi'),
+    path('reservasi/detail/<str:nama_fasilitas>/<str:tanggal>/', views.detail_reservasi, name='detail_reservasi'),
+    path('reservasi/edit/<str:nama_fasilitas>/<str:tanggal>/', views.edit_reservasi, name='edit_reservasi'),
+    path('reservasi/update/', views.update_reservasi, name='update_reservasi'),
+    path('reservasi/konfirmasi_batal/<str:nama_fasilitas>/<str:tanggal>/', views.konfirmasi_batal, name='konfirmasi_batal'),
+    # path('reservasi/create/', views.create_reservasi, name='create_reservasi'),
 
-    # Create Reservasi
-    path('reservasi/create/', views.reservasi_create, name='reservasi_create'),
 
-    # Edit and Delete
-    path('reservasi/edit/<str:nama_atraksi>/<str:tanggal>/', views.reservasi_edit, name='reservasi_edit'),
-    path('reservasi/delete/<str:nama_atraksi>/<str:tanggal>/', views.reservasi_delete, name='reservasi_delete'),
+    path('admin/reservasi/', views.list_semua_reservasi, name='list_semua_reservasi'),
+    path('admin/reservasi/edit/<str:nama_fasilitas>/<str:tanggal>/', views.edit_status_reservasi, name='edit_status_reservasi'),
+
 ]
-

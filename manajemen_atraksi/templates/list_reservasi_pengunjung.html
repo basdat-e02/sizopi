@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="min-h-screen bg-gray-900 py-12 px-6">
+    <div class="max-w-6xl mx-auto space-y-12">
+        <!-- Reservasi Saya -->
+        <div>
+            <h2 class="text-2xl font-bold mb-6 text-white">Reservasi Saya</h2>
+            <div class="overflow-x-auto bg-gray-800 shadow-lg rounded-lg">
+                <div class="border-b bg-gray-700 text-white px-6 py-3">
+                    <h4 class="text-lg font-semibold mb-0">Daftar Reservasi</h4>
+                </div>
+                <div class="p-6">
+                    <table class="min-w-full table-auto text-white">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-semibold">Nama Fasilitas</th>
+                                <th class="px-6 py-3 text-left font-semibold">Jadwal</th>
+                                <th class="px-6 py-3 text-left font-semibold">Jadwal Kunjungan</th>
+                                <th class="px-6 py-3 text-left font-semibold">Jumlah Tiket</th>
+                                <th class="px-6 py-3 text-left font-semibold">Status</th>
+                                <th class="px-6 py-3 text-center font-semibold">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in reservasi_saya %}
+                            <tr class="border-t border-gray-700 hover:bg-gray-700">
+                                <td class="px-6 py-4">
+                                    <a href="{% url 'manajemen_atraksi:detail_reservasi' item.0 item.5|date:'Y-m-d' %}" class="text-blue-400 hover:underline">
+                                        {{ item.0 }}
+                                    </a>
+                                </td>
+                                <td class="px-6 py-4">{{ item.1 }}</td>
+                                <td class="px-6 py-4">{{ item.5 }}</td>
+                                <td class="px-6 py-4">{{ item.2 }}</td>
+                                <td class="px-6 py-4">{{ item.3 }}</td>
+<td class="px-6 py-4 text-center space-x-2">
+    {% if item.3 != 'Dibatalkan' %}
+        <a href="{% url 'manajemen_atraksi:edit_reservasi' item.0|urlencode item.5|date:'Y-m-d' %}" 
+           class="text-yellow-400 hover:underline">
+           [Edit]
+        </a>
+        <a href="#" 
+           data-nama="{{ item.0 }}" 
+           data-tanggal="{{ item.1|date:"Y-m-d" }}"
+           onclick="bukaModal(this.dataset.nama, this.dataset.tanggal)" 
+           class="text-red-400 hover:underline">
+           [Batalkan]
+        </a>
+    {% else %}
+        <span class="text-gray-500">-</span>
+    {% endif %}
+</td>
+
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-gray-400">Belum ada reservasi.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservasi Tiket -->
+        <div>
+            <h2 class="text-2xl font-bold mb-6 text-white">Reservasi Tiket Atraksi dan Wahana</h2>
+            <div class="overflow-x-auto bg-gray-800 shadow-lg rounded-lg">
+                <div class="border-b bg-gray-700 text-white px-6 py-3">
+                    <h4 class="text-lg font-semibold mb-0">Tiket Tersedia</h4>
+                </div>
+                <div class="p-6">
+                    <table class="min-w-full table-auto text-white">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-semibold">Nama Fasilitas</th>
+                                <th class="px-6 py-3 text-left font-semibold">Jadwal</th>
+                                <th class="px-6 py-3 text-left font-semibold">Kapasitas Tersedia</th>
+                                <th class="px-6 py-3 text-center font-semibold">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in reservasi_tersedia %}
+                            <tr class="border-t border-gray-700 hover:bg-gray-700">
+                                <td class="px-6 py-4">{{ item.0 }}</td>
+                                <td class="px-6 py-4">{{ item.1 }}</td>
+                                <td class="px-6 py-4">{{ item.2 }} dari {{ item.3 }}</td>
+                                <td class="px-6 py-4 text-center">
+                        
+                                    {% if item.2 > 0 %}
+                                        <a href="{% url 'manajemen_atraksi:form_reservasi' %}?fasilitas={{ item.0 }}" class="text-green-400 hover:underline">[Pesan Tiket]</a>
+                                    {% else %}
+                                        <span class="text-gray-500">Tiket Habis</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Popup -->
+<div id="batalModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 text-black">
+    <h3 class="text-lg font-bold mb-4">Konfirmasi Pembatalan</h3>
+    <p id="modalMessage" class="mb-6"></p>
+
+    <form id="batalForm" method="POST">
+      {% csrf_token %}
+      <div class="flex justify-end space-x-3">
+        <button type="button" onclick="tutupModal()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Batal</button>
+        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Ya, Batalkan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function bukaModal(namaFasilitas, tanggal) {
+    const modal = document.getElementById('batalModal');
+    const form = document.getElementById('batalForm');
+    const message = document.getElementById('modalMessage');
+    const url = `/reservasi/batalkan/${encodeURIComponent(namaFasilitas)}/${tanggal}/`;
+    form.action = url;
+    message.innerHTML = `Apakah kamu yakin ingin membatalkan reservasi untuk <strong>${namaFasilitas}</strong> pada <strong>${tanggal}</strong>?`;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function tutupModal() {
+    const modal = document.getElementById('batalModal');
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+  }
+</script>
+
+{% endblock %}

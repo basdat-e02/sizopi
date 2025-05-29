@@ -251,3 +251,85 @@ DROP TRIGGER IF EXISTS log_hewan_update ON HEWAN;
 CREATE TRIGGER log_hewan_update
 AFTER UPDATE OF status_kesehatan, nama_habitat ON HEWAN
 FOR EACH ROW EXECUTE FUNCTION trg_log_hewan_update();
+
+CREATE OR REPLACE FUNCTION trg_habitat_no_shrink_below_current ()
+RETURNS trigger AS
+$$
+DECLARE
+    current_count INT;
+BEGIN
+    /* Jalankan hanya jika kapasitas BERKURANG */
+    IF NEW.kapasitas < OLD.kapasitas THEN
+        SELECT COUNT(*)
+          INTO current_count
+          FROM hewan
+         WHERE nama_habitat = NEW.nama;
+
+        IF NEW.kapasitas < current_count THEN
+            RAISE EXCEPTION
+              'Tidak dapat menurunkan kapasitas habitat % ke % karena sudah ada % hewan.',
+              NEW.nama, NEW.kapasitas, current_count;
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS habitat_check_shrink ON habitat;
+CREATE TRIGGER habitat_check_shrink
+BEFORE UPDATE OF kapasitas
+ON habitat
+FOR EACH ROW
+EXECUTE FUNCTION trg_habitat_no_shrink_below_current();
+
+
+
+CREATE OR REPLACE FUNCTION trg_hewan_check_capacity ()
+RETURNS trigger AS
+$$
+DECLARE
+    max_capacity   INT;
+    current_count  INT;
+BEGIN
+    /* 1. Jika NEW.nama_habitat NULL, aturan tak berlaku */
+    IF NEW.nama_habitat IS NULL THEN
+        RETURN NEW;
+    END IF;
+
+    /* 2. Kunci baris habitat untuk konsistensi */
+    SELECT kapasitas
+      INTO max_capacity
+      FROM habitat
+     WHERE nama = NEW.nama_habitat
+     FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Habitat % tidak ditemukan.', NEW.nama_habitat;
+    END IF;
+
+    /* 3. Hitung hewan di habitat (abaikan diri sendiri saat UPDATE) */
+    SELECT COUNT(*)
+      INTO current_count
+      FROM hewan
+     WHERE nama_habitat = NEW.nama_habitat
+       AND (TG_OP = 'INSERT' OR id <> OLD.id);
+
+    IF current_count >= max_capacity THEN
+        RAISE EXCEPTION
+          'Habitat % penuh: kapasitas %, hewan_saat_ini %.',
+          NEW.nama_habitat,          -- 1st %
+          max_capacity,              -- 2nd %
+          current_count;             -- 3rd %
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS hewan_check_capacity ON hewan;
+CREATE TRIGGER hewan_check_capacity
+BEFORE INSERT OR UPDATE OF nama_habitat
+ON hewan
+FOR EACH ROW
+EXECUTE FUNCTION trg_hewan_check_capacity();
