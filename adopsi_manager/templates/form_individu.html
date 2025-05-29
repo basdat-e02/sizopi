@@ -3,72 +3,77 @@
 {% block content %}
 {% include "navbar.html" %}
 
-<div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-6">
-  <div class="w-full max-w-2xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
-    <h1 class="text-xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">
-      FORM ADOPSI SATWA (Individu)
-    </h1>
-    <form method="post">
-      {% csrf_token %}
-      <div class="space-y-6">
-        <!-- Data Adopter -->
-        <div>
-          <p class="text-sm text-gray-700 dark:text-gray-300">Pihak di bawah ini (Adopter):</p>
-          <p class="mt-1 dark:text-gray-200"><strong>Nama:</strong> {{ pengguna.nama_depan }}</p>
-          <div class="mt-2">
-            <label for="nik" class="block text-sm font-medium text-gray-700 dark:text-gray-300">NIK</label>
-            <input id="nik" name="nik" type="text" required
-                   class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600
-                          focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
-          </div>
-          <p class="mt-2 dark:text-gray-200"><strong>Alamat:</strong> {{ pengguna.alamat }}</p>
-          <p class="mt-2 dark:text-gray-200"><strong>Nomor Telepon:</strong> {{ pengguna.no_telepon }}</p>
-        </div>
+<div class="max-w-lg mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-10">
+  <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+    Form Adopsi Satwa (Individu)
+  </h2>
 
-        <hr class="border-gray-300 dark:border-gray-600">
+  <form method="post">
+    {% csrf_token %}
+    <!-- flag langkah -->
+    <input type="hidden" name="step" value="create">
+    <input type="hidden" name="jenis" value="{{ jenis }}">
+    <input type="hidden" name="username" value="{{ username }}">
+    <input type="hidden" name="id_hewan" value="{{ id_hewan }}">
 
-        <!-- Data Hewan -->
-        <div>
-          <p class="text-sm text-gray-700 dark:text-gray-300">Satwa yang diadopsi:</p>
-          <p class="mt-1 dark:text-gray-200"><strong>Nama:</strong> {{ hewan.nama_hewan }}</p>
-          <p class="mt-1 dark:text-gray-200"><strong>Jenis:</strong> {{ hewan.jenis }}</p>
-        </div>
+    <!-- Data Pengunjung -->
+    <div class="mb-2">
+      <dt class="font-semibold inline">Nama Pengunjung:</dt>
+      <span class="ml-2">{{ nama_depan }}</span>
+    </div>
+    <div class="mb-2">
+      <dt class="font-semibold inline">Alamat:</dt>
+      <span class="ml-2">{{ alamat }}</span>
+    </div>
+    <div class="mb-2">
+      <dt class="font-semibold inline">No. Telepon:</dt>
+      <span class="ml-2">{{ no_telepon }}</span>
+    </div>
+    <hr class="my-4">
 
-        <!-- Kontribusi & Periode -->
-        <div>
-          <label for="kontribusi" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Nominal Kontribusi
-          </label>
-          <input id="kontribusi" name="kontribusi" type="number" required
-                 class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600
-                        focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
-        </div>
-        <div>
-          <label for="periode" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Periode Adopsi
-          </label>
-          <select id="periode" name="periode" required
-                  class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600
-                         focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
-            <option value="3">3 bulan</option>
-            <option value="6">6 bulan</option>
-            <option value="12">12 bulan</option>
-          </select>
-        </div>
-      </div>
+    <!-- Data Hewan -->
+    <div class="mb-2">
+      <dt class="font-semibold inline">Nama Hewan:</dt>
+      <span class="ml-2">{{ nama_hewan }}</span>
+    </div>
+    <div class="mb-4">
+      <dt class="font-semibold inline">Jenis Hewan:</dt>
+      <span class="ml-2">{{ jenis_hewan }}</span>
+    </div>
 
-      <!-- Footer Buttons -->
-      <div class="flex justify-end gap-4 mt-8">
-        <a href="{% url 'cancel_adopsi' hewan.id %}"
-           class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400">
-          Batal
-        </a>
-        <button type="submit"
-                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-          Submit Form
-        </button>
-      </div>
-    </form>
-  </div>
+    <!-- NIK (wajib) -->
+    <div class="mb-4">
+      <label for="nik" class="block font-semibold">NIK</label>
+      <input type="text" id="nik" name="nik" required
+             class="w-full border rounded px-2 py-1"/>
+    </div>
+
+    <!-- Nominal kontribusi -->
+    <div class="mb-4">
+      <label for="kontribusi" class="block font-semibold">Nominal Kontribusi</label>
+      <input type="number" id="kontribusi" name="kontribusi" min="0" required
+             class="w-full border rounded px-2 py-1"/>
+    </div>
+
+    <!-- Periode (bulan) -->
+    <div class="mb-6">
+      <label for="periode" class="block font-semibold">Periode Adopsi (bulan)</label>
+      <select id="periode" name="periode" class="w-full border rounded px-2 py-1" required>
+        <option value="3">3</option>
+        <option value="6">6</option>
+        <option value="12">12</option>
+      </select>
+    </div>
+
+    <div class="flex justify-between">
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        Submit Form
+      </button>
+      <a href="{% url 'view_adopsi' %}"
+         class="px-4 py-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        Batal
+      </a>
+    </div>
+  </form>
 </div>
 {% endblock content %}

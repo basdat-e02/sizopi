@@ -13,40 +13,38 @@
             <th class="border px-4 py-2">Foto</th>
             <th class="border px-4 py-2">Hewan</th>
             <th class="border px-4 py-2">Jenis</th>
-            <th class="border px-4 py-2">Kondisi</th>
             <th class="border px-4 py-2">Status</th>
             <th class="border px-4 py-2">Aksi</th>
           </tr>
         </thead>
         <tbody>
           {% for a in adopsi_list %}
-          <tr class="bg-white dark:bg-gray-800">
-            <td class="border px-4 py-2">
-              <img src="{{ a.foto_url }}" alt="{{ a.nama_hewan }}" class="h-16 w-16 object-cover rounded">
-            </td>
-            <td class="border px-4 py-2">{{ a.nama_hewan }}</td>
-            <td class="border px-4 py-2">{{ a.jenis }}</td>
-            <td class="border px-4 py-2">{{ a.kondisi }}</td>
-            <td class="border px-4 py-2">
-              {% if a.adopter %}
+            <tr class="bg-white dark:bg-gray-800">
+              <td class="border px-4 py-2">
+                <img src="{{ a.foto_url }}" alt="{{ a.nama_hewan }}"
+                     class="h-16 w-16 object-cover rounded">
+              </td>
+              <td class="border px-4 py-2">{{ a.nama_hewan }}</td>
+              <td class="border px-4 py-2">{{ a.jenis }}</td>
+              <td class="border px-4 py-2">
                 <span class="text-green-600 font-semibold">Diadopsi</span>
-              {% else %}
-                <span class="text-gray-600 font-semibold">Tidak Diadopsi</span>
-              {% endif %}
-            </td>
-            <td class="border px-4 py-2">
-              <a href="{% url 'detail_adopsi_adopter' a.id %}"
-                 class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-                Lihat Detail
-              </a>
-            </td>
-          </tr>
+              </td>
+              <td class="border px-4 py-2">
+                <a href="{% url 'detail_adopsi_adopter'
+                              a.id_adopter 
+                              a.id_hewan 
+                              a.tgl_mulai_adopsi %}"
+                   class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                  Lihat Detail
+                </a>
+              </td>
+            </tr>
           {% empty %}
-          <tr>
-            <td colspan="6" class="border px-4 py-2 text-center text-gray-700 dark:text-gray-300">
-              Belum ada satwa yang diadopsi atau tersedia untuk diadopsi.
-            </td>
-          </tr>
+            <tr>
+              <td colspan="5" class="border px-4 py-2 text-center text-gray-700 dark:text-gray-300">
+                Kamu belum mengadopsi satwa apapun.
+              </td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>

@@ -3,52 +3,48 @@
 {% block content %}
 {% include "navbar.html" %}
 
-<div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-6">
-  <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
-    <h1 class="text-xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">
-      PENDATAAN ADOPTER
-    </h1>
-    {% if error %}
-      <p class="text-sm text-red-600 mb-4">{{ error }}</p>
-    {% endif %}
-    <form method="post">
-      {% csrf_token %}
-      <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Username Calon Adopter
-          </label>
-          <input name="username" type="text" value="{{ request.POST.username }}"
-                 class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600
-                        focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100"
-                 required>
-        </div>
-        <div>
-          <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adopsi sebagai</span>
-          <label class="inline-flex items-center">
-            <input type="radio" name="jenis" value="individu"
-                   class="form-radio" 
-                   {% if request.POST.jenis != "organisasi" %}checked{% endif %}>
-            <span class="ml-2 dark:text-gray-100">Individu</span>
-          </label>
-          <label class="inline-flex items-center ml-6">
-            <input type="radio" name="jenis" value="organisasi" class="form-radio"
-                   {% if request.POST.jenis == "organisasi" %}checked{% endif %}>
-            <span class="ml-2 dark:text-gray-100">Organisasi</span>
-          </label>
-        </div>
-      </div>
-      <div class="flex justify-end gap-4 mt-6">
-        <a href="{% url 'view_adopsi' %}"
-           class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400">
-          Batal
-        </a>
-        <button type="submit"
-                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-          Verifikasi Akun
-        </button>
-      </div>
-    </form>
-  </div>
+<div class="max-w-lg mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-10">
+  <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+    Verifikasi Akun Adopter untuk Hewan {{ id_hewan }}
+  </h2>
+
+  {% if error %}
+    <div class="mb-4 p-2 bg-red-100 text-red-700 rounded">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="step" value="lookup">
+    <div class="mb-4">
+      <label class="block font-semibold text-gray-800 dark:text-gray-100">Pilih Jenis Adopter</label>
+      <label class="inline-flex items-center mr-4">
+        <input type="radio" name="jenis" value="individu" checked class="form-radio"/>
+        <span class="ml-2 text-gray-700 dark:text-gray-300">Individu</span>
+      </label>
+      <label class="inline-flex items-center">
+        <input type="radio" name="jenis" value="organisasi" class="form-radio"/>
+        <span class="ml-2 text-gray-700 dark:text-gray-300">Organisasi</span>
+      </label>
+    </div>
+
+    <div class="mb-4">
+      <label for="username" class="block font-semibold text-gray-800 dark:text-gray-100">
+        Username Pengunjung
+      </label>
+      <input type="text" id="username" name="username" required
+             class="w-full border rounded px-3 py-2 mt-1
+                    text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-700"
+             placeholder="Masukkan username..." />
+    </div>
+
+    <div class="flex justify-end">
+      <button type="submit"
+              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        Verifikasi Akun
+      </button>
+    </div>
+  </form>
 </div>
 {% endblock content %}
