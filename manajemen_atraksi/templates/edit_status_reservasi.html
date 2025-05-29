@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="min-h-screen bg-gray-900 py-12 px-6 text-white">
+    <div class="max-w-xl mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Edit Status Reservasi</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            <p><strong>Username:</strong> {{ reservasi.username }}</p>
+            <p><strong>Fasilitas:</strong> {{ reservasi.fasilitas }}</p>
+            <p><strong>Tanggal Kunjungan:</strong> {{ reservasi.tanggal }}</p>
+
+            <div class="mt-4">
+                <label for="status" class="block mb-2 font-semibold">Status:</label>
+                <select name="status" id="status" class="w-full p-3 rounded bg-gray-700 border border-gray-600">
+                    <option value="Pending" {% if reservasi.status == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Confirmed" {% if reservasi.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+                    <option value="Canceled" {% if reservasi.status == 'Canceled' %}selected{% endif %}>Canceled</option>
+                </select>
+
+            </div>
+
+            <div class="flex justify-end mt-6 space-x-3">
+                <a href="{% url 'manajemen_atraksi:list_semua_reservasi' %}" class="bg-gray-600 px-4 py-2 rounded hover:bg-gray-700">Batal</a>
+                <button type="submit" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 font-semibold">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

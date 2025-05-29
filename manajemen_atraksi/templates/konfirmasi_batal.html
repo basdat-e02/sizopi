@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Konfirmasi Pembatalan</h2>
+
+<p>Apakah kamu yakin ingin membatalkan reservasi untuk <strong>{{ nama_fasilitas }}</strong> pada <strong>{{ tanggal }}</strong>?</p>
+
+<form method="POST" action="{% url 'manajemen_atraksi:batalkan_reservasi' nama_fasilitas tanggal %}">
+    {% csrf_token %}
+    <button type="submit" style="color: red;">Ya, Batalkan</button>
+    <a href="{% url 'manajemen_atraksi:detail_reservasi' nama_fasilitas tanggal %}">Tidak, Kembali</a>
+</form>
+
+{% endblock %}

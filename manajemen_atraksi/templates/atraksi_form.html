@@ -2,7 +2,8 @@
 
 {% block content %}
 {% include "navbar.html" %}
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
     <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-6">
 
@@ -42,31 +43,42 @@
     <input type="text" name="lokasi" id="lokasi" class="bg-gray-700 text-white w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ atraksi.lokasi|default:'' }}" required>
 </div>
 
-<!-- Pelatih -->
-<div>
-    <label for="pelatih" class="block text-sm font-semibold text-white">Pelatih</label>
-    <select name="pelatih" id="pelatih" class="bg-gray-700 text-white w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-        <option value="">-- Pilih Pelatih --</option>
-        {% for pelatih in pelatih_list %}
-        <option value="{{ pelatih.username }}" {% if atraksi and atraksi.pelatih == pelatih.username %}selected{% endif %}>
-            {{ pelatih.nama_depan }} {{ pelatih.nama_belakang }}
-        </option>
-        {% endfor %}
-    </select>
-</div>
 
-<!-- Hewan -->
-<div>
-    <label for="hewan" class="block text-sm font-semibold text-white">Hewan yang Terlibat</label>
-    <select name="hewan" id="hewan" class="bg-gray-700 text-white w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" multiple>
-        {% for hewan in hewan_list %}
-        <option value="{{ hewan.id }}" {% if atraksi and hewan.id in atraksi.hewan_terlibat %}selected{% endif %}>
-            {{ hewan.nama }}
-        </option>
-        {% endfor %}
-    </select>
-</div>
+                <!-- Pelatih Checkboxes -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-white mb-2">Pelatih</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {% for pelatih in pelatih_list %}
+                        <div class="flex items-center">
+                            <input type="checkbox" name="pelatih" id="pelatih-{{ pelatih.username_lh }}" 
+                                   value="{{ pelatih.username_lh }}" 
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                   {% if atraksi and pelatih.username_lh in atraksi.pelatih %}checked{% endif %}>
+                            <label for="pelatih-{{ pelatih.username_lh }}" class="ml-2 block text-sm text-gray-300">
+                                {{ pelatih.username_lh }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
 
+                <!-- Hewan Checkboxes -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-white mb-2">Hewan yang Terlibat</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {% for hewan in hewan_list %}
+                        <div class="flex items-center">
+                            <input type="checkbox" name="hewan" id="hewan-{{ hewan.id }}" 
+                                   value="{{ hewan.id|stringformat:"s" }}"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                   {% if atraksi and hewan.id in atraksi.hewan_terlibat %}checked{% endif %}>
+                            <label for="hewan-{{ hewan.id }}" class="ml-2 block text-sm text-gray-300">
+                                {{ hewan.nama }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
 
                 <div class="mt-6 flex justify-end">
                     <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -77,4 +89,46 @@
         </form>
     </div>
 </div>
+
+
+
+<!-- Initialize Select2 -->
+<style>
+/* Additional dark mode styling */
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #4b5563;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #3b82f6;
+}
+.select2-dropdown {
+    background-color: #374151;
+    border-color: #4b5563;
+}
+</style>
+<script>
+$(document).ready(function() {
+    // Initialize pelatih select
+    $('.pelatih-select').select2({
+        placeholder: "Pilih Pelatih",
+        allowClear: true,
+        width: '100%',
+        theme: 'dark'
+    });
+    
+    // Initialize hewan select
+    $('.hewan-select').select2({
+        placeholder: "Pilih Hewan",
+        allowClear: true,
+        width: '100%',
+        theme: 'dark'
+    });
+    
+    // Dark mode adaptations
+    $('.select2-container--default .select2-selection--multiple').addClass('bg-gray-700 border-gray-600');
+    $('.select2-container--default .select2-search__field').addClass('text-white');
+    $('.select2-container--default .select2-selection__choice').addClass('bg-gray-600 border-gray-500 text-white');
+});
+</script>
+
 {% endblock %}
