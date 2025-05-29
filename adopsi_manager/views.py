@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect
 from django.db import IntegrityError, connection
 from django.utils import timezone
 from django.utils.dateformat import DateFormat
-
+from django.http import Http404  
 from main.views import login_required_custom, allowed_roles, get_user_role
 
 
@@ -518,73 +518,87 @@ def program_adopsi(request):
 @login_required_custom
 @allowed_roles(['pengunjung_adopter'])
 def detail_adopsi_adopter(request, id_adopter, id_hewan, tgl_mulai_adopsi):
-    # ambil record adopsi
+    # parsing tanggal
+    mulai_date = datetime.strptime(tgl_mulai_adopsi, '%Y-%m-%d').date()
+
+    # ambil detail adopsi + info hewan
     with connection.cursor() as cur:
         cur.execute("""
             SELECT
-              ap.id_adopter,
-              ap.id_hewan,
-              ap.tgl_mulai_adopsi,
-              ap.tgl_berhenti_adopsi,
-              ap.kontribusi_finansial,
-              ap.status_pembayaran,
-              h.nama                AS nama_hewan,
-              h.spesies             AS jenis,
-              h.nama_habitat        AS habitat,
-              h.url_foto            AS foto_url
-            FROM ADOPSI ap
-            JOIN HEWAN h
-              ON h.id = ap.id_hewan
-            WHERE ap.id_adopter       = %s
-              AND ap.id_hewan         = %s
-              AND ap.tgl_mulai_adopsi = %s
-        """, [id_adopter, id_hewan, tgl_mulai_adopsi])
+              ad.id_adopter,
+              ad.id_hewan,
+              ad.tgl_mulai_adopsi,
+              ad.tgl_berhenti_adopsi,
+              ad.kontribusi_finansial,
+              ad.status_pembayaran,
+              h.nama         AS nama_hewan,
+              h.spesies      AS jenis,
+              h.nama_habitat AS habitat
+            FROM ADOPSI ad
+            JOIN HEWAN h ON h.id = ad.id_hewan
+            WHERE ad.id_adopter = %s
+              AND ad.id_hewan   = %s
+              AND ad.tgl_mulai_adopsi = %s
+        """, [id_adopter, id_hewan, mulai_date])
         r = cur.fetchone()
 
     if not r:
         return redirect('program_adopsi')
 
     adopsi = {
-        'id_adopter':       r[0],
-        'id_hewan':         r[1],
-        'tgl_mulai':        DateFormat(r[2]).format('Y-m-d'),
-        'tgl_berhenti':     DateFormat(r[3]).format('Y-m-d'),
-        'kontribusi':       r[4],
-        'status':           r[5],
-        'nama_hewan':       r[6],
-        'jenis':            r[7],
-        'habitat':          r[8],
-        'foto_url':         r[9],
+        'id_adopter':           r[0],
+        'id_hewan':             r[1],
+        'tgl_mulai_adopsi':     DateFormat(r[2]).format('Y-m-d'),
+        'tgl_berhenti_adopsi':  DateFormat(r[3]).format('Y-m-d'),
+        'kontribusi_finansial': r[4],
+        'status_pembayaran':    r[5],
+        'nama_hewan':           r[6],
+        'jenis':                r[7],
+        'habitat':              r[8],
     }
 
     return render(request, 'detail_adopsi_adopter.html', {
-        'role':  get_user_role(request.session.get('username')),
-        'adopsi': adopsi
+        'role':   get_user_role(request.session.get('username')),
+        'adopsi': adopsi,
     })
-
 
 # ————————————————————
 # 4. Laporan Kondisi Satwa (Adopter)
 # ————————————————————
 
 @login_required_custom
-@allowed_roles(['pengunjung_adopter'])
+@allowed_roles(['pengunjung', 'pengunjung_adopter'])
 def laporan_kondisi(request, id_adopter, id_hewan, tgl_mulai_adopsi):
+    # ambil data hewan & adopsi seperti yang sudah kamu punya...
     with connection.cursor() as cur:
-        cur.execute(
-            "SELECT * FROM get_rekam_medis(%s, %s, %s)",
-            [id_adopter, id_hewan, tgl_mulai_adopsi]
-        )
-        rows = cur.fetchall()
-    rekam_medis = [
-        {'tanggal': r[1], 'dokter': r[2], 'status': r[3], 'diagnosa': r[4], 'pengobatan': r[5], 'tindak_lanjut': r[6]}
-        for r in rows
-    ]
+        # contoh mengambil data medis
+        cur.execute("""
+            SELECT tanggal_pemeriksaan, username_dh, status_kesehatan,
+                   diagnosis, pengobatan, catatan_tindak_lanjut
+              FROM CATATAN_MEDIS
+             WHERE id_hewan = %s
+          ORDER BY tanggal_pemeriksaan DESC
+        """, [id_hewan])
+        medis = [
+            {
+                'tanggal': row[0],
+                'dokter':  row[1],
+                'status':  row[2],
+                'diagnosa':row[3],
+                'pengobatan': row[4],
+                'catatan': row[5],
+            }
+            for row in cur.fetchall()
+        ]
+
     return render(request, 'laporan_kondisi.html', {
         'role': get_user_role(request.session.get('username')),
-        'rekam_medis': rekam_medis
+        'medis_list': medis,
+        # yang hilang:
+        'id_adopter':      id_adopter,
+        'id_hewan':        id_hewan,
+        'tgl_mulai_adopsi': tgl_mulai_adopsi,
     })
-
 
 # ————————————————————
 # 5. Sertifikat Adopsi (Adopter)
@@ -593,45 +607,49 @@ def laporan_kondisi(request, id_adopter, id_hewan, tgl_mulai_adopsi):
 @login_required_custom
 @allowed_roles(['pengunjung_adopter'])
 def certificate_adopsi(request, id_adopter, id_hewan, tgl_mulai_adopsi):
+    # ambil data adopsi & adopter info & hewan
     with connection.cursor() as cur:
-        cur.execute(
-            "SELECT * FROM get_adopsi_by_pk(%s, %s, %s)",
-            [id_adopter, id_hewan, tgl_mulai_adopsi]
-        )
+        cur.execute("SELECT * FROM get_adopsi_by_pk(%s,%s,%s)",
+                    [id_adopter, id_hewan, tgl_mulai_adopsi])
         r = cur.fetchone()
-    if not r:
-        return redirect('program_adopsi')
+        if not r:
+            return redirect('program_adopsi')
+        # r = (id_adopter,id_hewan,tgl_mulai,tgl_berhenti,kontrib, status)
+        mulai, akhir = r[2], r[3]
+        # adopter detail: cek individu dulu
+        cur.execute("SELECT nama, nik FROM INDIVIDU WHERE id_adopter = %s", [id_adopter])
+        ind = cur.fetchone()
+        if ind:
+            nama_adopter = ind[0]
+        else:
+            cur.execute("SELECT nama_organisasi FROM ORGANISASI WHERE id_adopter = %s", [id_adopter])
+            nama_adopter = cur.fetchone()[0]
+        # hewan
+        cur.execute("SELECT nama, spesies FROM HEWAN WHERE id = %s", [id_hewan])
+        nama_hewan, jenis = cur.fetchone()
 
-    with connection.cursor() as cur:
-        cur.execute("SELECT * FROM get_hewan_by_id(%s)", [r[1]])
-        hw = cur.fetchone()
-
-    sertifikat = {
-        'adopter':        request.session.get('username'),
-        'jenis':          hw[2] if hw else '',
-        'nama_hewan':     r[7] if len(r) > 7 else '',
-        'tgl_mulai':      DateFormat(r[2]).format('Y-m-d'),
-        'tgl_berhenti':   DateFormat(r[3]).format('Y-m-d'),
+    ctx = {
+        'nama_adopter': nama_adopter,
+        'nama_hewan':   nama_hewan,
+        'jenis':        jenis,
+        'tgl_mulai':    DateFormat(mulai).format('Y-m-d'),
+        'tgl_berhenti': DateFormat(akhir).format('Y-m-d'),
     }
-    return render(request, 'sertifikat_adopsi.html', {
-        'role': get_user_role(request.session.get('username')),
-        'adopsi': sertifikat
-    })
+    return render(request, 'sertifikat_adopsi.html', ctx)
+
 
 @login_required_custom
 @allowed_roles(['pengunjung_adopter'])
 def modal_berhenti_adopter(request, id_adopter, id_hewan, tgl_mulai_adopsi):
-    """
-    Tampilkan modal konfirmasi berhenti adopsi, dan panggil delete_adopsi jika disubmit.
-    """
-    if request.method == 'POST':
-        with connection.cursor() as cur:
-            cur.execute(
-                "SELECT delete_adopsi(%s, %s, %s)",
-                [id_adopter, id_hewan, tgl_mulai_adopsi]
-            )
-        return redirect('program_adopsi')
+    # Immediately delete the adoption and send back to program_adopsi
+    with connection.cursor() as cur:
+        cur.execute(
+            "SELECT delete_adopsi(%s, %s, %s)",
+            [id_adopter, id_hewan, tgl_mulai_adopsi]
+        )
+    return redirect('program_adopsi')
 
+    
     # ambil data agar bisa ditampilkan di modal
     with connection.cursor() as cur:
         cur.execute(
@@ -660,15 +678,109 @@ def modal_berhenti_adopter(request, id_adopter, id_hewan, tgl_mulai_adopsi):
 @login_required_custom
 @allowed_roles(['pengunjung_adopter'])
 def extend_adopsi(request, id_adopter, id_hewan, tgl_mulai_adopsi):
-    """
-    Alihkan ke detail_adopsi_adopter untuk memperpanjang.
-    """
-    return redirect(
-        'detail_adopsi_adopter',
-        id_adopter=id_adopter,
-        id_hewan=id_hewan,
-        tgl_mulai_adopsi=tgl_mulai_adopsi
+    # 1. Parse tanggal mulai adopsi
+    try:
+        mulai_date = datetime.strptime(tgl_mulai_adopsi, '%Y-%m-%d').date()
+    except ValueError:
+        raise Http404("Format tanggal tidak valid")
+
+    # 2. Ambil data adopter, pengguna, dan hewan
+    with connection.cursor() as cur:
+        # 2.1 Cek apakah ini Individu
+        cur.execute("SELECT nik FROM INDIVIDU WHERE id_adopter = %s", [id_adopter])
+        is_individu = bool(cur.fetchone())
+
+        # 2.2 Ambil data pengguna berdasarkan tipe
+        if is_individu:
+            cur.execute("""
+                SELECT u.nama_depan, p.alamat, u.no_telepon
+                  FROM PENGUNJUNG p
+                  JOIN PENGGUNA u       ON u.username         = p.username_P
+                  JOIN ADOPTER a        ON a.username_adopter = p.username_P
+                 WHERE a.id_adopter     = %s
+            """, [id_adopter])
+        else:
+            cur.execute("""
+                SELECT o.nama_organisasi AS nama_depan,
+                       COALESCE(p.alamat, '')   AS alamat,
+                       u.no_telepon
+                  FROM ORGANISASI o
+                  JOIN ADOPTER    a ON a.id_adopter       = o.id_adopter
+                  LEFT JOIN PENGUNJUNG p ON p.username_P    = a.username_adopter
+                  JOIN PENGGUNA    u ON u.username         = a.username_adopter
+                 WHERE o.id_adopter     = %s
+            """, [id_adopter])
+
+        pengguna_row = cur.fetchone()
+        if not pengguna_row:
+            label = "individu" if is_individu else "organisasi"
+            raise Http404(f"Data {label} tidak ditemukan")
+
+        nama_depan, alamat, no_telepon = pengguna_row
+
+        # 2.3 Ambil data hewan
+        cur.execute("SELECT nama, spesies FROM HEWAN WHERE id = %s", [id_hewan])
+        hewan_row = cur.fetchone()
+        if not hewan_row:
+            raise Http404("Data hewan tidak ditemukan")
+        nama_hewan, jenis_hewan = hewan_row
+
+    # 3. Siapkan context
+    ctx = {
+        'role':             get_user_role(request.session.get('username')),
+        'id_adopter':       id_adopter,
+        'id_hewan':         id_hewan,
+        'tgl_mulai_adopsi': tgl_mulai_adopsi,
+        'pengguna': {
+            'nama_depan': nama_depan,
+            'alamat':     alamat,
+            'no_telepon': no_telepon,
+        },
+        'hewan': {
+            'nama_hewan': nama_hewan,
+            'jenis':      jenis_hewan,
+        },
+    }
+
+    # 4. Jika form disubmit (POST), proses perpanjangan
+    if request.method == 'POST':
+        try:
+            periode = int(request.POST['periode'])
+            kontrib = int(request.POST['kontribusi'])
+        except (KeyError, ValueError):
+            ctx['error'] = "Periode & kontribusi harus berupa angka."
+            template = (
+                'perpanjang_adopsi_individu.html'
+                if is_individu else
+                'perpanjang_adopsi_organisasi.html'
+            )
+            return render(request, template, ctx)
+
+        tambahan_hari = periode * 30  # asumsi 1 bulan = 30 hari
+        with connection.cursor() as cur:
+            cur.execute("""
+                UPDATE ADOPSI
+                   SET tgl_berhenti_adopsi  = tgl_berhenti_adopsi + INTERVAL '%s days',
+                       kontribusi_finansial = kontribusi_finansial + %s
+                 WHERE id_adopter         = %s
+                   AND id_hewan           = %s
+                   AND tgl_mulai_adopsi    = %s
+            """, [tambahan_hari, kontrib, id_adopter, id_hewan, mulai_date])
+
+        return redirect(
+            'detail_adopsi_adopter',
+            id_adopter=id_adopter,
+            id_hewan=id_hewan,
+            tgl_mulai_adopsi=tgl_mulai_adopsi
+        )
+
+    # 5. Render form GET (Individu atau Organisasi)
+    template = (
+        'perpanjang_adopsi_individu.html'
+        if is_individu else
+        'perpanjang_adopsi_organisasi.html'
     )
+    return render(request, template, ctx)
 
 # ————————————————————
 # 6–9. Statistik & Riwayat Adopter (Admin)

@@ -1,51 +1,71 @@
 {% extends "base.html" %}
-{% block meta %}<title>Perpanjang Adopsi</title>{% endblock meta %}
+{% block meta %}
+  <title>Perpanjang Adopsi Individu</title>
+{% endblock meta %}
+
 {% block content %}
-{% include "navbar.html" %}
-<div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-6">
-  <div class="w-full max-w-2xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
-    <h1 class="text-xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">Form Perpanjang Periode Adopsi (Individu)</h1>
-    <form method="post">
+  {% include "navbar.html" %}
+
+  <div class="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">
+      Perpanjang Adopsi Individu
+    </h2>
+
+    <!-- Informasi Pengguna -->
+    <div class="mb-6">
+      <h3 class="text-lg font-medium mb-2 text-gray-700 dark:text-gray-200">Data Pengguna</h3>
+      <ul class="space-y-1 text-gray-700 dark:text-gray-300 text-sm">
+        <li><strong>Nama:</strong> {{ pengguna.nama_depan }}</li>
+        <li><strong>Alamat:</strong> {{ pengguna.alamat }}</li>
+        <li><strong>Telepon:</strong> {{ pengguna.no_telepon }}</li>
+      </ul>
+    </div>
+
+    <!-- Informasi Hewan -->
+    <div class="mb-6">
+      <h3 class="text-lg font-medium mb-2 text-gray-700 dark:text-gray-200">Data Hewan</h3>
+      <ul class="space-y-1 text-gray-700 dark:text-gray-300 text-sm">
+        <li><strong>Nama Hewan:</strong> {{ hewan.nama_hewan }}</li>
+        <li><strong>Jenis:</strong> {{ hewan.jenis }}</li>
+        <li><strong>Tgl. Mulai Adopsi:</strong> {{ tgl_mulai_adopsi }}</li>
+      </ul>
+    </div>
+
+    <!-- Form Perpanjangan -->
+    <form method="post" action="{% url 'extend_adopsi' id_adopter id_hewan tgl_mulai_adopsi %}" class="space-y-4">
       {% csrf_token %}
-      <div class="space-y-6">
-        <div>
-          <p class="text-sm text-gray-700 dark:text-gray-300">Pihak di bawah ini (Adopter):</p>
-          <p class="mt-1 dark:text-gray-200"><strong>Nama:</strong> {{ pengguna.nama_depan }}</p>
-          <div class="mt-2">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">NIK</label>
-            <input name="nik" type="text" required
-                   class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
-          </div>
-          <p class="mt-2 dark:text-gray-200"><strong>Alamat:</strong> {{ pengguna.alamat }}</p>
-          <p class="mt-2 dark:text-gray-200"><strong>Nomor Telepon:</strong> {{ pengguna.no_telepon }}</p>
-        </div>
-        <hr class="border-gray-300 dark:border-gray-600">
-        <div>
-          <p class="text-sm text-gray-700 dark:text-gray-300">Satwa:</p>
-          <p class="mt-1 dark:text-gray-200"><strong>Nama:</strong> {{ hewan.nama_hewan }}</p>
-          <p class="mt-1 dark:text-gray-200"><strong>Jenis:</strong> {{ hewan.jenis }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nominal Tambahan</label>
-          <input name="kontribusi" type="number" required
-                 class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Periode Tambahan</label>
-          <select name="periode" required
-                  class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
-            <option value="3">3 bulan</option>
-            <option value="6">6 bulan</option>
-            <option value="12">12 bulan</option>
-          </select>
-        </div>
+      <div>
+        <label for="tgl_berhenti_adopsi" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Tanggal Berhenti Adopsi Baru
+        </label>
+        <input
+          type="date"
+          name="tgl_berhenti_adopsi"
+          id="tgl_berhenti_adopsi"
+          required
+          min="{{ tgl_mulai_adopsi }}"
+          class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm
+                 focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-100"
+        />
       </div>
-      <div class="flex justify-end gap-4 mt-8"> 
-        <a href="{% url 'detail_adopsi_adopter' hewan.id %}" 
-           class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400">Batal</a>
-        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Submit Form</button>
+
+      <div class="flex items-center space-x-3">
+        <button
+          type="submit"
+          class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow"
+        >
+          Perpanjang
+        </button>
+        <a
+          href="{% url 'detail_adopsi_adopter'
+                      id_adopter=id_adopter
+                      id_hewan=id_hewan
+                      tgl_mulai_adopsi=tgl_mulai_adopsi %}"
+          class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg shadow"
+        >
+          Batal
+        </a>
       </div>
     </form>
   </div>
-</div>
 {% endblock content %}

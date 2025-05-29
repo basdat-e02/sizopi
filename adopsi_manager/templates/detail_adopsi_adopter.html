@@ -1,26 +1,51 @@
 {% extends "base.html" %}
-{% load humanize %}
-{% block meta %}<title>Detail Adopsi Satwa</title>{% endblock meta %}
+{% block meta %}<title>Detail Adopsi Saya</title>{% endblock meta %}
 {% block content %}
 {% include "navbar.html" %}
 
-<div class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-10">
-  <button onclick="history.back()"
-          class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
-    &larr; Kembali
-  </button>
-  <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100 my-4">Detail Adopsi</h1>
-  <img src="{{ adopsi.foto_url }}" alt="{{ adopsi.nama_hewan }}"
-       class="w-full h-48 object-cover rounded mb-4">
+<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-md w-full p-6 relative">
+    <!-- Close -->
+    <button onclick="history.back()"
+            class="absolute top-4 right-4 text-2xl text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
+      &times;
+    </button>
 
-  <ul class="space-y-2 text-gray-800 dark:text-gray-100">
-    <li><strong>Nama Hewan:</strong> {{ adopsi.nama_hewan }}</li>
-    <li><strong>Jenis:</strong> {{ adopsi.jenis }}</li>
-    <li><strong>Habitat:</strong> {{ adopsi.habitat }}</li>
-    <li><strong>Tgl. Mulai:</strong> {{ adopsi.tgl_mulai }}</li>
-    <li><strong>Tgl. Berhenti:</strong> {{ adopsi.tgl_berhenti }}</li>
-    <li><strong>Kontribusi:</strong> Rp {{ adopsi.kontribusi|intcomma }}</li>
-    <li><strong>Status:</strong> {{ adopsi.status }}</li>
-  </ul>
+    <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+      Informasi Adopsi Satwa
+    </h1>
+
+    <ul class="space-y-2 text-gray-800 dark:text-gray-200 text-sm mb-6">
+      <li><strong>Nama Hewan:</strong> {{ adopsi.nama_hewan }}</li>
+      <li><strong>Jenis/Spesies:</strong> {{ adopsi.jenis }}</li>
+      <li><strong>Habitat:</strong> {{ adopsi.habitat }}</li>
+      <li><strong>Tanggal Mulai:</strong> {{ adopsi.tgl_mulai_adopsi }}</li>
+      <li><strong>Tanggal Berhenti:</strong> {{ adopsi.tgl_berhenti_adopsi }}</li>
+      <li><strong>Status Pembayaran:</strong> {{ adopsi.status_pembayaran }}</li>
+      <li><strong>Kontribusi:</strong> Rp {{ adopsi.kontribusi_finansial }}</li>
+    </ul>
+
+    <div class="flex flex-wrap gap-2">
+      <a href="{% url 'laporan_kondisi' adopsi.id_adopter adopsi.id_hewan adopsi.tgl_mulai_adopsi %}"
+         class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+        Pantau Kondisi
+      </a>
+
+      <a href="{% url 'certificate_adopsi' adopsi.id_adopter adopsi.id_hewan adopsi.tgl_mulai_adopsi %}"
+         class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded">
+        Lihat Sertifikat
+      </a>
+
+      <a href="{% url 'extend_adopsi' adopsi.id_adopter adopsi.id_hewan adopsi.tgl_mulai_adopsi %}"
+         class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded">
+        Perpanjang Adopsi
+      </a>
+
+      <a href="{% url 'modal_berhenti_adopter' adopsi.id_adopter adopsi.id_hewan adopsi.tgl_mulai_adopsi %}"
+         class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded">
+        Stop Adopsi
+      </a>
+    </div>
+  </div>
 </div>
 {% endblock content %}
