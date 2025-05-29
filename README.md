@@ -59,7 +59,8 @@ Berikut beberapa akun yang dapat digunakan untuk pengujian fitur login dan dashb
 
 | Role                   | Username  | Password    |
 |------------------------|-----------|-------------|
-| Pengunjung             | user1     | password1   |
+| Pengunjung             | user21    | password21  |
+| Pengunjung Adopter     | user1     | password1   |
 | Dokter Hewan           | user51    | password51  |
 | Penjaga Hewan          | user66    | password66  |
 | Pelatih Pertunjukan    | user76    | password76  |
