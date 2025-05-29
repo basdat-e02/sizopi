@@ -1,41 +1,38 @@
 {% extends "base.html" %}
-{% block meta %}<title>Perpanjang Adopsi</title>{% endblock meta %}
+{% block meta %}
+  <title>Perpanjang Adopsi Organisasi</title>
+{% endblock meta %}
+
 {% block content %}
-{% include "navbar.html" %}
-<div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-6">
-  <div class="w-full max-w-2xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
-    <h1 class="text-xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">Form Perpanjang Periode Adopsi (Organisasi)</h1>
-    <form method="post">
+  {% include "navbar.html" %}
+
+  <div class="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold mb-4">Perpanjang Adopsi Organisasi</h2>
+
+    <form method="post"
+          action="{% url 'extend_adopsi' id_adopter id_hewan tgl_mulai_adopsi %}">
       {% csrf_token %}
-      <div class="space-y-6">
+
+      <!-- Informasi adopter & hewan (readonly) -->
+      <div class="grid grid-cols-1 gap-4">
         <div>
-          <p class="text-sm text-gray-700 dark:text-gray-300">Pihak di bawah ini, selaku organisasi:</p>
-          <div class="mt-2">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Organisasi</label>
-            <input name="nama_org" type="text" required
-                   class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
-          </div>
-          <div class="mt-2">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">NPP</label>
-            <input name="npp" type="text" required
-                   class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
-          </div>
-          <p class="mt-2 dark:text-gray-200"><strong>Alamat:</strong> {{ pengguna.alamat }}</p>
-          <p class="mt-2 dark:text-gray-200"><strong>Kontak:</strong> {{ pengguna.no_telepon }}</p>
-        </div>
-        <hr class="border-gray-300 dark:border-gray-600">
-        <div>
-          <p class="text-sm text-gray-700 dark:text-gray-300">Satwa:</p>
-          <p class="mt-1 dark:text-gray-200"><strong>Nama:</strong> {{ hewan.nama_hewan }}</p>
-          <p class="mt-1 dark:text-gray-200"><strong>Jenis:</strong> {{ hewan.jenis }}</p>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Organisasi</label>
+          <input type="text" readonly
+                 value="{{ pengguna.nama_depan }}"
+                 class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nominal Tambahan</label>
-          <input name="kontribusi" type="number" required
-                 class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Hewan</label>
+          <input type="text" readonly
+                 value="{{ hewan.nama_hewan }} ({{ hewan.jenis }})"
+                 class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
         </div>
+      </div>
+
+      <!-- Pilihan periode & kontribusi -->
+      <div class="mt-6 space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Periode Tambahan</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Periode Tambahan (bulan)</label>
           <select name="periode" required
                   class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
             <option value="3">3 bulan</option>
@@ -43,13 +40,30 @@
             <option value="12">12 bulan</option>
           </select>
         </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tambahan Kontribusi (Rp)</label>
+          <input type="number" name="kontribusi" min="0" required
+                 class="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring focus:border-blue-400 dark:text-gray-100">
+        </div>
       </div>
+
+      {% if error %}
+        <p class="text-red-500 mt-2">{{ error }}</p>
+      {% endif %}
+
+      <!-- Tombol Batal + Submit -->
       <div class="flex justify-end gap-4 mt-8">
-        <a href="{% url 'detail_adopsi_adopter' hewan.id %}"
-           class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400">Batal</a>
-        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Submit Form</button>
+        <!-- Link Batal: sekarang lengkap dengan 3 args -->
+        <a href="{% url 'detail_adopsi_adopter' id_adopter id_hewan tgl_mulai_adopsi %}"
+           class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400">
+          Batal
+        </a>
+
+        <button type="submit"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+          Submit Form
+        </button>
       </div>
     </form>
   </div>
-</div>
 {% endblock content %}

@@ -676,56 +676,48 @@ def modal_berhenti_adopter(request, id_adopter, id_hewan, tgl_mulai_adopsi):
     })
 
 @login_required_custom
+@login_required_custom
 @allowed_roles(['pengunjung_adopter'])
 def extend_adopsi(request, id_adopter, id_hewan, tgl_mulai_adopsi):
-    # 1. Parse tanggal mulai adopsi
+    # 1. Parse tanggal mulai
     try:
         mulai_date = datetime.strptime(tgl_mulai_adopsi, '%Y-%m-%d').date()
     except ValueError:
         raise Http404("Format tanggal tidak valid")
 
-    # 2. Ambil data adopter, pengguna, dan hewan
+    # 2. Cek tipe dan ambil data pengguna + hewan (sama seperti sebelumnya)
     with connection.cursor() as cur:
-        # 2.1 Cek apakah ini Individu
         cur.execute("SELECT nik FROM INDIVIDU WHERE id_adopter = %s", [id_adopter])
         is_individu = bool(cur.fetchone())
-
-        # 2.2 Ambil data pengguna berdasarkan tipe
         if is_individu:
             cur.execute("""
                 SELECT u.nama_depan, p.alamat, u.no_telepon
                   FROM PENGUNJUNG p
-                  JOIN PENGGUNA u       ON u.username         = p.username_P
+                  JOIN PENGGUNA u       ON u.username = p.username_P
                   JOIN ADOPTER a        ON a.username_adopter = p.username_P
-                 WHERE a.id_adopter     = %s
+                 WHERE a.id_adopter = %s
             """, [id_adopter])
         else:
             cur.execute("""
-                SELECT o.nama_organisasi AS nama_depan,
-                       COALESCE(p.alamat, '')   AS alamat,
-                       u.no_telepon
+                SELECT o.nama_organisasi, COALESCE(p.alamat,''), u.no_telepon
                   FROM ORGANISASI o
-                  JOIN ADOPTER    a ON a.id_adopter       = o.id_adopter
-                  LEFT JOIN PENGUNJUNG p ON p.username_P    = a.username_adopter
-                  JOIN PENGGUNA    u ON u.username         = a.username_adopter
-                 WHERE o.id_adopter     = %s
+                  JOIN ADOPTER    a     ON a.id_adopter = o.id_adopter
+                  LEFT JOIN PENGUNJUNG p ON p.username_P = a.username_adopter
+                  JOIN PENGGUNA    u     ON u.username = a.username_adopter
+                 WHERE o.id_adopter = %s
             """, [id_adopter])
-
         pengguna_row = cur.fetchone()
         if not pengguna_row:
-            label = "individu" if is_individu else "organisasi"
-            raise Http404(f"Data {label} tidak ditemukan")
-
+            raise Http404("Data pengguna tidak ditemukan")
         nama_depan, alamat, no_telepon = pengguna_row
 
-        # 2.3 Ambil data hewan
         cur.execute("SELECT nama, spesies FROM HEWAN WHERE id = %s", [id_hewan])
         hewan_row = cur.fetchone()
         if not hewan_row:
             raise Http404("Data hewan tidak ditemukan")
         nama_hewan, jenis_hewan = hewan_row
 
-    # 3. Siapkan context
+    # 3. Context untuk template
     ctx = {
         'role':             get_user_role(request.session.get('username')),
         'id_adopter':       id_adopter,
@@ -742,21 +734,17 @@ def extend_adopsi(request, id_adopter, id_hewan, tgl_mulai_adopsi):
         },
     }
 
-    # 4. Jika form disubmit (POST), proses perpanjangan
+    # 4. Proses POST: update dan redirect
     if request.method == 'POST':
         try:
             periode = int(request.POST['periode'])
             kontrib = int(request.POST['kontribusi'])
         except (KeyError, ValueError):
             ctx['error'] = "Periode & kontribusi harus berupa angka."
-            template = (
-                'perpanjang_adopsi_individu.html'
-                if is_individu else
-                'perpanjang_adopsi_organisasi.html'
-            )
+            template = 'perpanjang_adopsi_individu.html' if is_individu else 'perpanjang_adopsi_organisasi.html'
             return render(request, template, ctx)
 
-        tambahan_hari = periode * 30  # asumsi 1 bulan = 30 hari
+        tambahan_hari = periode * 30
         with connection.cursor() as cur:
             cur.execute("""
                 UPDATE ADOPSI
@@ -767,19 +755,16 @@ def extend_adopsi(request, id_adopter, id_hewan, tgl_mulai_adopsi):
                    AND tgl_mulai_adopsi    = %s
             """, [tambahan_hari, kontrib, id_adopter, id_hewan, mulai_date])
 
+        # **Gunakan positional args di sini** agar tidak keliru menjadi satu arg kosong  
         return redirect(
             'detail_adopsi_adopter',
-            id_adopter=id_adopter,
-            id_hewan=id_hewan,
-            tgl_mulai_adopsi=tgl_mulai_adopsi
+            id_adopter,
+            id_hewan,
+            tgl_mulai_adopsi
         )
 
-    # 5. Render form GET (Individu atau Organisasi)
-    template = (
-        'perpanjang_adopsi_individu.html'
-        if is_individu else
-        'perpanjang_adopsi_organisasi.html'
-    )
+    # 5. Render GET form
+    template = 'perpanjang_adopsi_individu.html' if is_individu else 'perpanjang_adopsi_organisasi.html'
     return render(request, template, ctx)
 
 # ————————————————————
