@@ -27,14 +27,14 @@
  
        {# ============== MENU SPESIFIK ROLE ============= #}
        {% if role == "dokter hewan" %}
-         <li><a href="{% url 'rekam_medis' %}">Rekam Medis</a></li>
-         <li><a href="{% url 'view_satwa' %}">Data Satwa</a></li>
+         <li><a class="nav-link">Rekam Medis</a></li>
+         <li><a href="{% url 'view_satwa' %}" class="nav-link">Data Satwa</a></li>
 
  
        {% elif role == "penjaga hewan" %}
          <li><a class="nav-link">Catatan Perawatan</a></li>
-         <li><a href="{% url 'view_satwa' %}">Data Satwa</a></li>
-         <li><a href="{% url 'view_habitat' %}">Data Habitat</a></li>
+         <li><a href="{% url 'view_satwa' %}" class="nav-link">Data Satwa</a></li>
+         <li><a href="{% url 'view_habitat' %}" class="nav-link">Daftar Habitat</a></li>
  
        {% elif role == "staf admin" %}
          <li><a class="nav-link">Kelola Pengunjung</a></li>
@@ -43,18 +43,19 @@
          <li><a class="nav-link">Kelola Atraksi</a></li>
          <li><a class="nav-link">Kelola Wahana</a></li>
          <li><a class="nav-link">Kelola Reservasi</a>
-        <li><a href="{% url 'view_satwa' %}">Data Satwa</a></li>
-        <li><a href="{% url 'view_habitat' %}">Data Habitat</a></li>
+         <li><a href="{% url 'view_satwa' %}" class="nav-link">Data Satwa</a></li>
+         <li><a href="{% url 'view_habitat' %}" class="nav-link">Daftar Habitat</a></li>
  
        {% elif role == "pelatih pertunjukan" %}
          <li><a class="nav-link">Jadwal Pertunjukan</a></li>
  
-       {% elif role == "pengunjung" %}
+       {% elif role == "pengunjung" or role == "pengunjung_adopter"%}
          <li><a class="nav-link">Info Kebun</a></li>
          <li><a class="nav-link">Reservasi Tiket</a></li>
  
-       {% elif role == "pengunjung_adopter" %}
-         <li><a class="nav-link">Hewan Adopsi</a></li>
+          {% if role == "pengunjung_adopter" %}
+            <li><a href="{% url 'view_adopsi' %}" class="nav-link">Hewan Adopsi</a></li>
+          {% endif %}
        {% endif %}
  
        {# ============== MENU UMUM SEMUA ROLE =========== #}

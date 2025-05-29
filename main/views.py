@@ -382,7 +382,7 @@ def register_staff(request):
 def logout_user(request):
     request.session.flush()
     message = f"Logout berhasil, sampai jumpa!"
-    return redirect(f'/show_message/?msg={message}&type=success&next_url=login')
+    return redirect(f'/show_message/?msg={message}&type=success&next_url=auth_option')
 
 # @login_required_custom   
 # def dashboard(request):
@@ -675,10 +675,11 @@ def profile(request):
         })
 
         # Role-specific GET
-        if role == 'pengunjung':
+        if role == 'pengunjung' or role == 'pengunjung_adopter':
             cursor.execute("SELECT alamat, tgl_lahir FROM PENGUNJUNG WHERE username_P=%s", [username])
             addr, born = cursor.fetchone()
             data.update({'address': addr, 'birthdate': born})
+            print(born)
 
         elif role == 'dokter hewan':
             # Sertifikasi
