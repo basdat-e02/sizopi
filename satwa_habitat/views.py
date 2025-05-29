@@ -31,6 +31,7 @@ def view_satwa(request):
             'tanggal_lahir' : hewan[4],
             'status' : hewan[5],
             'habitat' : hewan[6],
+            'url_foto' : hewan[7],
         })
 
     context = {

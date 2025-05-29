@@ -9,276 +9,356 @@
 {% include "navbar.html" %}
 
 <div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
-  <div class="max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+    <div class="max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
 
-    <!-- Header -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">REKAM MEDIS</h1>
-      <div class="flex justify-end mt-2">
-        <button id="openModalBtn" class="text-blue-500 hover:underline">
-          [+ Tambah Rekam Medis]
-        </button>
-      </div>
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">REKAM MEDIS</h1>
+            <div class="flex justify-end mt-2">
+                <button id="openAddRekamMedisModal" class="text-blue-500 hover:underline">
+                    [+ Tambah Rekam Medis]
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="table-auto w-full text-sm text-left text-gray-800 dark:text-gray-100 border">
+                <thead class="bg-gray-200 dark:bg-gray-700 font-semibold">
+                    <tr>
+                        <th class="border px-4 py-2 text-center">Tanggal Pemeriksaan</th>
+                        <th class="border px-4 py-2 text-center">Nama Dokter</th>
+                        <th class="border px-4 py-2 text-center">Status Kesehatan</th>
+                        <th class="border px-4 py-2 text-center">Diagnosa</th>
+                        <th class="border px-4 py-2 text-center">Pengobatan</th>
+                        <th class="border px-4 py-2 text-center">Catatan Tindak Lanjut</th>
+                        <th class="border px-4 py-2 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="rekamMedisTableBody">
+                    {% for rm in data_rekam_medis %}
+                    <tr class="bg-white dark:bg-gray-800 hover:bg-gray-700" data-id-hewan="{{ rm.id_hewan }}">
+                        <td class="hidden id_hewan">{{ rm.id_hewan }}</td>
+                        <td class="border px-4 py-2 tanggal text-center">{{ rm.tanggal_pemeriksaan|date:"Y-m-d" }}</td>
+                        <td class="border px-4 py-2 dokter text-center">{{ rm.nama_dokter }}</td>
+                        <td class="border px-4 py-2 status text-center">{{ rm.status_kesehatan }}</td>
+                        <td class="border px-4 py-2 diagnosa text-center">{{ rm.diagnosis }}</td>
+                        <td class="border px-4 py-2 pengobatan text-center">{{ rm.pengobatan }}</td>
+                        <td class="border px-4 py-2 tindak_lanjut text-center">{{ rm.catatan_tindak_lanjut }}</td>
+                        <td class="border px-4 py-2 text-center space-x-2">
+                            <button onclick="openEditRekamMedisModal(
+                                    '{{ rm.id_hewan }}',
+                                    '{{ rm.tanggal_pemeriksaan|date:"Y-m-d" }}',
+                                    '{{ rm.diagnosis|escapejs }}',
+                                    '{{ rm.pengobatan|escapejs }}',
+                                    '{{ rm.status_kesehatan }}',
+                                    '{{ rm.catatan_tindak_lanjut|escapejs }}'
+                                )" class="text-blue-500 hover:underline">[Edit]</button>
+                            <button onclick="confirmDeleteRekamMedis('{{ rm.id_hewan }}', '{{ rm.tanggal_pemeriksaan|date:"Y-m-d" }}')"
+                                class="text-red-500 hover:underline">[Hapus]</button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="border px-4 py-2 text-center">Tidak ada rekam medis.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
     </div>
-
-    <!-- Table -->
-    <div class="overflow-x-auto">
-      <table class="table-auto w-full text-sm text-left text-gray-800 dark:text-gray-100 border">
-        <thead class="bg-gray-200 dark:bg-gray-700 font-semibold">
-          <tr>
-            <th class="border px-4 py-2 text-center">Tanggal Pemeriksaan</th>
-            <th class="border px-4 py-2 text-center">Nama Dokter</th>
-            <th class="border px-4 py-2 text-center">Status Kesehatan</th>
-            <th class="border px-4 py-2 text-center">Diagnosa</th>
-            <th class="border px-4 py-2 text-center">Pengobatan</th>
-            <th class="border px-4 py-2 text-center">Catatan Tindak Lanjut</th>
-            <th class="border px-4 py-2 text-center">Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="rekamMedisTable">
-          <!-- Dummy row 1 -->
-          <tr class="bg-white dark:bg-gray-800">
-            <td class="border px-4 py-2 tanggal">2025-04-01</td>
-            <td class="border px-4 py-2 dokter">Dr. Siti Aminah</td>
-            <td class="border px-4 py-2 status">Sakit</td>
-            <td class="border px-4 py-2 diagnosa">Infeksi saluran pernapasan</td>
-            <td class="border px-4 py-2 pengobatan">Antibiotik 7 hari</td>
-            <td class="border px-4 py-2 tindak_lanjut">Perbaikan ventilasi kandang</td>
-            <td class="border px-4 py-2 text-center space-x-2">
-              <a href="#" class="text-blue-500 hover:underline edit-btn">[Edit]</a>
-              <a href="#" class="text-red-500 hover:underline delete-btn">[Hapus]</a>
-            </td>
-          </tr>
-          <!-- Dummy row 2 -->
-          <tr class="bg-gray-50 dark:bg-gray-700">
-            <td class="border px-4 py-2 tanggal">2025-03-05</td>
-            <td class="border px-4 py-2 dokter">Dr. Budi Santoso</td>
-            <td class="border px-4 py-2 status">Sehat</td>
-            <td class="border px-4 py-2 diagnosa">–</td>
-            <td class="border px-4 py-2 pengobatan">Vitamin rutin</td>
-            <td class="border px-4 py-2 tindak_lanjut">Observasi harian</td>
-            <td class="border px-4 py-2 text-center space-x-2">
-              <!-- status 'Sehat' => edit-btn disembunyikan -->
-              <a href="#" class="text-blue-500 hover:underline edit-btn hidden">[Edit]</a>
-              <a href="#" class="text-red-500 hover:underline delete-btn">[Hapus]</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </div>
 </div>
 
-<!-- Modal Tambah Rekam Medis -->
-<div id="rekamMedisModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
-    <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
-      FORM PENCATATAN REKAM MEDIS
-    </h2>
-    <form id="rekamMedisForm">
-      {% csrf_token %}
-      <div class="space-y-4">
-        <div>
-          <label for="tanggal_pemeriksaan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Tanggal Pemeriksaan
-          </label>
-          <input type="date" id="tanggal_pemeriksaan" name="tanggal_pemeriksaan"
-                 class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
-                 required>
-        </div>
-        <div>
-          <label for="nama_dokter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Nama Dokter
-          </label>
-          <input type="text" id="nama_dokter" name="nama_dokter"
-                 class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
-                 required>
-        </div>
-        <div>
-          <label for="status_kesehatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Status Kesehatan
-          </label>
-          <select id="status_kesehatan" name="status_kesehatan"
-                  class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
-                  required>
-            <option value="">-- Pilih Status --</option>
-            <option value="Sehat">Sehat</option>
-            <option value="Sakit">Sakit</option>
-          </select>
-        </div>
-        <div>
-          <label for="diagnosa" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Diagnosa (Opsional)
-          </label>
-          <input type="text" id="diagnosa" name="diagnosa"
-                 class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm">
-        </div>
-        <div>
-          <label for="pengobatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Pengobatan (Opsional)
-          </label>
-          <textarea id="pengobatan" name="pengobatan" rows="3"
-                    class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"></textarea>
-        </div>
-      </div>
-      <div class="flex justify-end space-x-4 mt-6">
-        <button type="button" id="closeModalBtn"
-                class="px-4 py-2 border rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-          BATAL
-        </button>
-        <button type="submit"
-                class="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-          SIMPAN
-        </button>
-      </div>
-    </form>
-  </div>
+<div id="addRekamMedisModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
+            FORM PENCATATAN REKAM MEDIS
+        </h2>
+        <form method="POST" action="{% url 'rekam_medis' %}"> {# Action kembali ke URL utama rekam_medis #}
+            {% csrf_token %}
+            <div class="space-y-4">
+
+                <div>
+                    <label for="add_id_hewan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Pilih Hewan:
+                    </label>
+                    <select id="add_id_hewan" name="id_hewan" required
+                            class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm">
+                        <option value="">-- Pilih Hewan --</option>
+                        {% for hewan in hewan_list %}
+                            <option value="{{ hewan.id }}">{{ hewan.nama }} (ID: {{ hewan.id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="add_tanggal_pemeriksaan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Tanggal Pemeriksaan:
+                    </label>
+                    <input type="date" id="add_tanggal_pemeriksaan" name="tanggal"
+                           class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
+                           required>
+                </div>
+                <div>
+                    <label for="add_status_kesehatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Status:
+                    </label>
+                    <select id="add_status_kesehatan" name="status_kesehatan"
+                            class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
+                            required>
+                        <option value="">-- Pilih Status --</option>
+                        <option value="Sehat">Sehat</option>
+                        <option value="Sakit">Sakit</option>
+                    </select>
+                </div>
+                <div id="add_sick_fields" class="hidden">
+                    <div>
+                        <label for="add_diagnosis" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Diagnosa:
+                        </label>
+                        <input type="text" id="add_diagnosis" name="diagnosis"
+                               class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
+                               placeholder="Masukkan diagnosa">
+                    </div>
+                    <div>
+                        <label for="add_pengobatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Pengobatan:
+                        </label>
+                        <textarea id="add_pengobatan" name="pengobatan" rows="3"
+                                  class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
+                                  placeholder="Masukkan pengobatan"></textarea>
+                    </div>
+                </div>
+                <div>
+                    <label for="add_catatan_tindak_lanjut" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Catatan Tindak Lanjut:
+                    </label>
+                    <textarea id="add_catatan_tindak_lanjut" name="catatan_tindak_lanjut" rows="3"
+                                  class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
+                                  placeholder="Tambahkan catatan tindak lanjut"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-center space-x-4 mt-6">
+                <button type="button" id="cancelAddRekamMedis"
+                        class="px-4 py-2 border rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    BATAL
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                    SIMPAN
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
-<!-- Modal Edit -->
 <div id="editRekamMedisModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
-    <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">EDIT REKAM MEDIS</h2>
-    <div class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Catatan Tindak Lanjut</label>
-        <input id="editTindakLanjut" type="text" class="w-full border rounded p-2 mt-1">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Diagnosa Baru</label>
-        <input id="editDiagnosa" type="text" class="w-full border rounded p-2 mt-1">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pengobatan Baru</label>
-        <input id="editPengobatan" type="text" class="w-full border rounded p-2 mt-1">
-      </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
+            EDIT REKAM MEDIS
+        </h2>
+        <form method="POST" action="{% url 'update_rekam_medis' %}">
+            {% csrf_token %}
+            <input type="hidden" id="edit_id_hewan_original" name="id_hewan_original">
+            <input type="hidden" id="edit_tanggal_original" name="tanggal_original">
+
+            <div class="space-y-4">
+                <div>
+                    <label for="edit_tanggal_pemeriksaan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Tanggal Pemeriksaan:
+                    </label>
+                    <input type="date" id="edit_tanggal_pemeriksaan" name="tanggal_pemeriksaan"
+                           class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
+                           readonly>
+                </div>
+                <div>
+                    <label for="edit_status_kesehatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Status:
+                    </label>
+                    <select id="edit_status_kesehatan" name="status_kesehatan"
+                            class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
+                            required>
+                        <option value="Sehat">Sehat</option>
+                        <option value="Sakit">Sakit</option>
+                    </select>
+                </div>
+                <div id="edit_sick_fields">
+                    <div>
+                        <label for="edit_diagnosis" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Diagnosa:
+                        </label>
+                        <input type="text" id="edit_diagnosis" name="diagnosis"
+                               class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
+                               placeholder="Masukkan diagnosa">
+                    </div>
+                    <div>
+                        <label for="edit_pengobatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Pengobatan:
+                        </label>
+                        <textarea id="edit_pengobatan" name="pengobatan" rows="3"
+                                  class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
+                                  placeholder="Masukkan pengobatan"></textarea>
+                    </div>
+                </div>
+                <div>
+                    <label for="edit_catatan_tindak_lanjut" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Catatan Tindak Lanjut:
+                    </label>
+                    <textarea id="edit_catatan_tindak_lanjut" name="catatan_tindak_lanjut" rows="3"
+                                  class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm"
+                                  placeholder="Tambahkan catatan tindak lanjut"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-center space-x-4 mt-6">
+                <button type="button" id="cancelEditRekamMedis"
+                        class="px-4 py-2 border rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    BATAL
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                    SIMPAN PERUBAHAN
+                </button>
+            </div>
+        </form>
     </div>
-    <div class="flex justify-center space-x-4 mt-6">
-      <button id="saveEditBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">SIMPAN</button>
-      <button onclick="closeEdit()" class="px-4 py-2 border rounded text-gray-700 dark:text-gray-300">BATAL</button>
-    </div>
-  </div>
 </div>
 
-<!-- Modal Delete -->
-<div id="deleteRekamMedisModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6 text-center">
-    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">HAPUS REKAM MEDIS</h2>
-    <p>Apakah Anda yakin ingin menghapus rekam medis ini?</p>
-    <div class="flex justify-center space-x-6 mt-6">
-      <button onclick="confirmDelete()" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">YA</button>
-      <button onclick="closeDelete()" class="px-4 py-2 border rounded text-gray-700 dark:text-gray-300">TIDAK</button>
+<div id="deleteConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-sm p-6">
+        <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">Konfirmasi Hapus</h2>
+        <p class="text-gray-700 dark:text-gray-300 text-center mb-6">
+            Apakah Anda yakin ingin menghapus rekam medis ini?
+        </p>
+        <div class="flex justify-center space-x-4">
+            <button id="cancelDelete" class="px-4 py-2 border rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                BATAL
+            </button>
+            <a id="confirmDeleteButton" href="#" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                HAPUS
+            </a>
+        </div>
     </div>
-  </div>
 </div>
 
-<!-- Scripts -->
 <script>
-  const rekamMedisModal = document.getElementById('rekamMedisModal');
-  const openModalBtn     = document.getElementById('openModalBtn');
-  const closeModalBtn    = document.getElementById('closeModalBtn');
-  const editModal        = document.getElementById('editRekamMedisModal');
-  const deleteModal      = document.getElementById('deleteRekamMedisModal');
-  let   currentEditRow   = null;
+    // --- Variabel untuk Modal Tambah ---
+    const openAddRekamMedisModalBtn = document.getElementById('openAddRekamMedisModal');
+    const addRekamMedisModal = document.getElementById('addRekamMedisModal');
+    const cancelAddRekamMedisBtn = document.getElementById('cancelAddRekamMedis');
+    const addStatusKesehatanSelect = document.getElementById('add_status_kesehatan');
+    const addSickFieldsDiv = document.getElementById('add_sick_fields');
+    const addDiagnosisInput = document.getElementById('add_diagnosis');
+    const addPengobatanTextarea = document.getElementById('add_pengobatan');
+    const addCatatanTindakLanjutInput = document.getElementById('add_catatan_tindak_lanjut');
+    const addIdHewanSelect = document.getElementById('add_id_hewan'); // Ambil elemen select untuk ID Hewan
 
-  // Open / close tambah modal
-  openModalBtn.addEventListener('click', () => {
-    rekamMedisModal.classList.remove('hidden');
-    rekamMedisModal.classList.add('flex');
-  });
-  closeModalBtn.addEventListener('click', () => {
-    rekamMedisModal.classList.add('hidden');
-    rekamMedisModal.classList.remove('flex');
-  });
+    // --- Variabel untuk Modal Edit ---
+    const editRekamMedisModal = document.getElementById('editRekamMedisModal');
+    const cancelEditRekamMedisBtn = document.getElementById('cancelEditRekamMedis');
+    const editIdHewanOriginalInput = document.getElementById('edit_id_hewan_original');
+    const editTanggalOriginalInput = document.getElementById('edit_tanggal_original');
+    const editTanggalPemeriksaanInput = document.getElementById('edit_tanggal_pemeriksaan');
+    const editStatusKesehatanSelect = document.getElementById('edit_status_kesehatan');
+    const editSickFieldsDiv = document.getElementById('edit_sick_fields');
+    const editDiagnosisInput = document.getElementById('edit_diagnosis');
+    const editPengobatanTextarea = document.getElementById('edit_pengobatan');
+    const editCatatanTindakLanjutInput = document.getElementById('edit_catatan_tindak_lanjut');
 
-  // Open edit modal
-  function openEdit(row) {
-    currentEditRow = row;
-    document.getElementById('editTindakLanjut').value = row.querySelector('.tindak_lanjut').innerText;
-    document.getElementById('editDiagnosa').value      = row.querySelector('.diagnosa').innerText;
-    document.getElementById('editPengobatan').value    = row.querySelector('.pengobatan').innerText;
-    editModal.classList.remove('hidden');
-    editModal.classList.add('flex');
-  }
-  function closeEdit() {
-    editModal.classList.add('hidden');
-    editModal.classList.remove('flex');
-  }
-  document.getElementById('saveEditBtn').addEventListener('click', () => {
-    currentEditRow.querySelector('.tindak_lanjut').innerText = document.getElementById('editTindakLanjut').value;
-    currentEditRow.querySelector('.diagnosa').innerText      = document.getElementById('editDiagnosa').value;
-    currentEditRow.querySelector('.pengobatan').innerText    = document.getElementById('editPengobatan').value;
-    closeEdit();
-    alert('Rekam medis berhasil diubah.');
-  });
+    // --- Variabel untuk Modal Hapus ---
+    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+    const confirmDeleteButton = document.getElementById('confirmDeleteButton');
 
-  // Open / close delete modal
-  function openDelete() {
-    deleteModal.classList.remove('hidden');
-    deleteModal.classList.add('flex');
-  }
-  function closeDelete() {
-    deleteModal.classList.add('hidden');
-    deleteModal.classList.remove('flex');
-  }
-  function confirmDelete() {
-    currentEditRow.remove();
-    closeDelete();
-    alert('Rekam medis berhasil dihapus.');
-  }
-
-  // Submit tambah form
-  document.getElementById('rekamMedisForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    const tgl        = document.getElementById('tanggal_pemeriksaan').value;
-    const dokter     = document.getElementById('nama_dokter').value;
-    const status     = document.getElementById('status_kesehatan').value;
-    const diagnosa   = document.getElementById('diagnosa').value;
-    const pengobatan = document.getElementById('pengobatan').value;
-
-    const tbody = document.getElementById('rekamMedisTable');
-    const tr    = document.createElement('tr');
-    tr.classList.add('bg-white','dark:bg-gray-800');
-    tr.innerHTML = `
-      <td class="border px-4 py-2 tanggal">${tgl}</td>
-      <td class="border px-4 py-2 dokter">${dokter}</td>
-      <td class="border px-4 py-2 status">${status}</td>
-      <td class="border px-4 py-2 diagnosa">${diagnosa}</td>
-      <td class="border px-4 py-2 pengobatan">${pengobatan}</td>
-      <td class="border px-4 py-2 tindak_lanjut">-</td>
-      <td class="border px-4 py-2 text-center space-x-2">
-        <a href="#" class="text-blue-500 hover:underline edit-btn ${status==='Sakit'?'':'hidden'}">[Edit]</a>
-        <a href="#" class="text-red-500 hover:underline delete-btn">[Hapus]</a>
-      </td>`;
-
-    tbody.appendChild(tr);
-
-    // attach edit/delete to new row
-    tr.querySelector('.edit-btn').addEventListener('click', e=>{
-      e.preventDefault(); openEdit(tr);
-    });
-    tr.querySelector('.delete-btn').addEventListener('click', e=>{
-      e.preventDefault(); currentEditRow=tr; openDelete();
+    // --- Fungsi Modal Tambah ---
+    openAddRekamMedisModalBtn.addEventListener('click', () => {
+        addRekamMedisModal.classList.remove('hidden');
+        addRekamMedisModal.classList.add('flex');
+        addIdHewanSelect.value = ''; // Reset dropdown
+        document.getElementById('add_tanggal_pemeriksaan').value = '';
+        addStatusKesehatanSelect.value = '';
+        addSickFieldsDiv.classList.add('hidden');
+        addDiagnosisInput.value = '';
+        addDiagnosisInput.removeAttribute('required');
+        addPengobatanTextarea.value = '';
+        addPengobatanTextarea.removeAttribute('required');
+        addCatatanTindakLanjutInput.value = '';
     });
 
-    this.reset();
-    rekamMedisModal.classList.add('hidden');
-    rekamMedisModal.classList.remove('flex');
-    alert('Rekam medis berhasil ditambahkan.');
-  });
+    cancelAddRekamMedisBtn.addEventListener('click', () => {
+        addRekamMedisModal.classList.add('hidden');
+        addRekamMedisModal.classList.remove('flex');
+    });
 
-  // attach to existing dummies
-  document.querySelectorAll('#rekamMedisTable tr').forEach(row=>{
-    const st  = row.querySelector('.status').innerText.trim();
-    const eb  = row.querySelector('.edit-btn');
-    const db  = row.querySelector('.delete-btn');
-    if(st==='Sakit') {
-      eb.classList.remove('hidden');
-      eb.addEventListener('click', e=>{ e.preventDefault(); openEdit(row); });
+    addStatusKesehatanSelect.addEventListener('change', () => {
+        if (addStatusKesehatanSelect.value === 'Sakit') {
+            addSickFieldsDiv.classList.remove('hidden');
+            addDiagnosisInput.setAttribute('required', 'required');
+            addPengobatanTextarea.setAttribute('required', 'required');
+        } else {
+            addSickFieldsDiv.classList.add('hidden');
+            addDiagnosisInput.removeAttribute('required');
+            addPengobatanTextarea.removeAttribute('required');
+            addDiagnosisInput.value = '';
+            addPengobatanTextarea.value = '';
+        }
+    });
+
+    // --- Fungsi Modal Edit ---
+    function openEditRekamMedisModal(id_hewan, tanggal, diagnosis, pengobatan, status_kesehatan, catatan_tindak_lanjut) {
+        editIdHewanOriginalInput.value = id_hewan;
+        editTanggalOriginalInput.value = tanggal;
+        editTanggalPemeriksaanInput.value = tanggal; // Tampilkan juga di field tanggal yang read-only
+
+        editStatusKesehatanSelect.value = status_kesehatan;
+        editDiagnosisInput.value = diagnosis;
+        editPengobatanTextarea.value = pengobatan;
+        editCatatanTindakLanjutInput.value = catatan_tindak_lanjut;
+
+        // Tampilkan atau sembunyikan sick fields berdasarkan status
+        if (status_kesehatan === 'Sakit') {
+            editSickFieldsDiv.classList.remove('hidden');
+            editDiagnosisInput.setAttribute('required', 'required');
+            editPengobatanTextarea.setAttribute('required', 'required');
+        } else {
+            editSickFieldsDiv.classList.add('hidden');
+            editDiagnosisInput.removeAttribute('required');
+            editPengobatanTextarea.removeAttribute('required');
+        }
+
+        editRekamMedisModal.classList.remove('hidden');
+        editRekamMedisModal.classList.add('flex');
     }
-    db.addEventListener('click', e=>{ e.preventDefault(); currentEditRow=row; openDelete(); });
-  });
+
+    cancelEditRekamMedisBtn.addEventListener('click', () => {
+        editRekamMedisModal.classList.add('hidden');
+        editRekamMedisModal.classList.remove('flex');
+    });
+
+    editStatusKesehatanSelect.addEventListener('change', () => {
+        if (editStatusKesehatanSelect.value === 'Sakit') {
+            editSickFieldsDiv.classList.remove('hidden');
+            editDiagnosisInput.setAttribute('required', 'required');
+            editPengobatanTextarea.setAttribute('required', 'required');
+        } else {
+            editSickFieldsDiv.classList.add('hidden');
+            editDiagnosisInput.removeAttribute('required');
+            editPengobatanTextarea.removeAttribute('required');
+            editDiagnosisInput.value = ''; // Kosongkan jika berubah ke Sehat
+            editPengobatanTextarea.value = ''; // Kosongkan jika berubah ke Sehat
+        }
+    });
+
+    // --- Fungsi Modal Hapus ---
+    function confirmDeleteRekamMedis(id_hewan, tanggal) {
+        // Bentuk URL untuk DELETE
+        confirmDeleteButton.href = `/delete_rekam_medis/?id_hewan=${id_hewan}&tanggal=${tanggal}`;
+        deleteConfirmModal.classList.remove('hidden');
+        deleteConfirmModal.classList.add('flex');
+    }
+
+    cancelDeleteBtn.addEventListener('click', () => {
+        deleteConfirmModal.classList.add('hidden');
+        deleteConfirmModal.classList.remove('flex');
+    });
 </script>
 
 {% endblock content %}

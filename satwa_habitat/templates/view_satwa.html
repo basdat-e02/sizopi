@@ -33,7 +33,17 @@
             <td class="border px-4 py-2">{{ h.tanggal_lahir }}</td>
             <td class="border px-4 py-2">{{ h.status }}</td>
             <td class="border px-4 py-2">{{ h.habitat }}</td>
-            <td class="border px-4 py-2">[foto {{ h.nama|lower }}]</td>
+            <td class="border px-4 py-2">
+              <a href="{{ h.url_foto }}" target="_blank" rel="noopener noreferrer">
+                <img
+                  src="{{ h.url_foto }}"
+                  alt="Foto {{ h.nama }}"
+                  class="w-30 object-cover rounded-lg"  
+                  onload="this.classList.add('h-10')"       
+                  onerror="this.classList.remove('h-10')"   
+                />
+              </a>
+            </td>
             <td class="border px-4 py-2 space-x-2">
               <a href="{% url 'edit_satwa' h.id %}" class="text-blue-500 hover:underline">[Edit]</a>
               <form action="{% url 'view_satwa' %}" method="POST" onsubmit="return confirm('Yakin ingin menghapus {{ h.nama }}?');" class="inline">

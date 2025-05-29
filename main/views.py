@@ -382,9 +382,25 @@ def register_staff(request):
 def logout_user(request):
     request.session.flush()
     message = f"Logout berhasil, sampai jumpa!"
-    return redirect(f'/show_message/?msg={message}&type=success&next_url=login')
+    return redirect(f'/show_message/?msg={message}&type=success&next_url=auth_option')
 
-@login_required_custom   
+# @login_required_custom   
+# def dashboard(request):
+#     username = request.session['username']
+#     role = get_user_role(username)
+
+
+    # # Ambil data dasar PENGGUNA
+    # with connection.cursor() as cursor:
+    #     cursor.execute("""
+    #         SELECT nama_depan, nama_tengah, nama_belakang, email, no_telepon
+    #         FROM PENGGUNA
+    #         WHERE username = %s
+    #     """, [username])
+    #     dep, mid, bel, email, phone = cursor.fetchone()
+    # full_name = f"{dep}{(' ' + mid) if mid else ''} {bel}"
+
+@login_required_custom
 def dashboard(request):
     username = request.session['username']
     role = get_user_role(username)
@@ -396,46 +412,88 @@ def dashboard(request):
             FROM PENGGUNA
             WHERE username = %s
         """, [username])
-        dep, mid, bel, email, phone = cursor.fetchone()
-    full_name = f"{dep}{(' ' + mid) if mid else ''} {bel}"
+        user_data_row = cursor.fetchone()
+
+        if user_data_row:
+            dep, mid, bel, email, phone = user_data_row
+            full_name = f"{dep}{(' ' + mid) if mid else ''} {bel}"
+        else:
+            request.session.flush()
+            msg = quote("Data sesi Anda tidak valid atau pengguna tidak ditemukan. Silakan login kembali.")
+            # GANTI 'login_user' MENJADI 'login' DI BAWAH INI:
+            return redirect(f"{reverse('show_message')}?type=error&msg={msg}&next_url=login")
 
     context = {
-        'role':       role,
-        'full_name':  full_name,
-        'username':   username,
-        'email':      email,
-        'phone':      phone,
+        'role': role,
+        'full_name': full_name,
+        'username': username,
+        'email': email,
+        'phone': phone,
     }
 
-    # Pengunjung & Adopter
+    # Ambil data dasar PENGGUNA
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT nama_depan, nama_tengah, nama_belakang, email, no_telepon
+            FROM PENGGUNA
+            WHERE username = %s
+        """, [username])
+        user_data_row = cursor.fetchone() # Simpan hasil fetchone ke variabel dulu
+
+        if user_data_row:
+            dep, mid, bel, email, phone = user_data_row # Unpack jika ada data
+            full_name = f"{dep}{(' ' + mid) if mid else ''} {bel}"
+        else:
+            # === PENANGANAN KASUS PENTING JIKA USER TIDAK DITEMUKAN ===
+            # Ini bisa terjadi jika user di DB terhapus tapi sesi masih ada.
+            # Sebaiknya logout user dan redirect ke halaman login dengan pesan.
+            request.session.flush() # Hapus sesi user
+            msg = quote("Data sesi Anda tidak valid atau pengguna tidak ditemukan. Silakan login kembali.")
+            # Pastikan Anda sudah import `reverse` dari `django.urls` jika belum
+            # from django.urls import reverse
+            return redirect(f"{reverse('show_message')}?type=error&msg={msg}&next_url=login_user") # Asumsi nama URL login adalah 'login_user'
+
+
+    # Pengunjung & Adopter (CONTOH PENERAPAN PENGECEKAN serupa)
     if role in ('pengunjung', 'pengunjung_adopter'):
         with connection.cursor() as cursor:
             cursor.execute("SELECT alamat, tgl_lahir FROM PENGUNJUNG WHERE username_P = %s", [username])
-            address, birthdate = cursor.fetchone()
+            pengunjung_data_row = cursor.fetchone()
+            if pengunjung_data_row:
+                address, birthdate = pengunjung_data_row
+            else:
+                # Data pengunjung tidak konsisten, beri nilai default atau tangani error
+                address = "Alamat tidak ditemukan"
+                birthdate = None # Atau tanggal default jika diperlukan
+
             cursor.execute("SELECT COUNT(*) FROM RESERVASI WHERE username_p = %s", [username])
-            visit_count = cursor.fetchone()[0]
+            visit_count_row = cursor.fetchone()
+            visit_count = visit_count_row[0] if visit_count_row else 0
+
             cursor.execute("SELECT COALESCE(SUM(jumlah_tiket),0) FROM RESERVASI WHERE username_p = %s", [username])
-            ticket_count = cursor.fetchone()[0]
+            ticket_count_row = cursor.fetchone()
+            ticket_count = ticket_count_row[0] if ticket_count_row else 0
 
         context.update({
-            'address':      address,
-            'birthdate':    birthdate,
-            'visit_count':  visit_count,
+            'address': address,
+            'birthdate': birthdate,
+            'visit_count': visit_count,
             'ticket_count': ticket_count,
         })
 
         if role == 'pengunjung_adopter':
             with connection.cursor() as cursor:
                 cursor.execute("SELECT id_adopter FROM ADOPTER WHERE username_adopter = %s", [username])
-                row = cursor.fetchone()
+                adopter_row = cursor.fetchone() # Perhatikan ini juga
                 adoptions = []
-                if row:
+                if adopter_row: # Penanganan yang sudah baik jika adopter_row adalah None
+                    id_adopter = adopter_row[0]
                     cursor.execute("""
                         SELECT he.nama, a.status_pembayaran
                         FROM ADOPSI a
                         JOIN HEWAN he ON a.id_hewan = he.id
                         WHERE a.id_adopter = %s
-                    """, [row[0]])
+                    """, [id_adopter])
                     adoptions = cursor.fetchall()
             context['adoptions'] = adoptions
 
@@ -617,10 +675,11 @@ def profile(request):
         })
 
         # Role-specific GET
-        if role == 'pengunjung':
+        if role == 'pengunjung' or role == 'pengunjung_adopter':
             cursor.execute("SELECT alamat, tgl_lahir FROM PENGUNJUNG WHERE username_P=%s", [username])
             addr, born = cursor.fetchone()
             data.update({'address': addr, 'birthdate': born})
+            print(born)
 
         elif role == 'dokter hewan':
             # Sertifikasi

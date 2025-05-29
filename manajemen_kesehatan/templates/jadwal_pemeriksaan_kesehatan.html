@@ -9,139 +9,258 @@
 {% include "navbar.html" %}
 
 <div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
-  <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+    <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
 
-    <!-- Header -->
-    <h1 class="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
-      JADWAL PEMERIKSAAN KESEHATAN
-    </h1>
+        <h1 class="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
+            JADWAL PEMERIKSAAN KESEHATAN
+        </h1>
 
-    <!-- Frekuensi -->
-    <div class="text-center mb-4">
-      <p class="text-gray-700 dark:text-gray-300 text-lg">
-        Frekuensi Pemeriksaan Rutin:
-        <span id="frekuensiDisplay" class="font-semibold">3 bulan sekali</span>
-      </p>
+        <div class="text-center mb-4">
+            <p class="text-gray-700 dark:text-gray-300 text-lg">
+                Frekuensi Pemeriksaan Rutin:
+                <span id="frekuensiDisplay" class="font-semibold">
+                    {# Ambil nilai frekuensi dari konteks Django jika ada #}
+                    {% if frekuensi_rutin_display %}
+                        {{ frekuensi_rutin_display }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </span>
+            </p>
+        </div>
+
+        <div class="flex justify-end mb-4">
+            <button id="openAddModal" class="text-blue-600 hover:underline font-semibold">
+                [+ Tambah Jadwal Pemeriksaan]
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100">
+                <thead class="bg-gray-200 dark:bg-gray-700">
+                    <tr>
+                        <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+                            Nama Hewan
+                        </th>
+                        <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+                            Tanggal Pemeriksaan Selanjutnya
+                        </th>
+                        <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+                            Frekuensi Rutin (x bulan sekali)
+                        </th>
+                        <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+                            Aksi
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="jadwalTableBody">
+                    {# Loop melalui data_jadwal yang dikirim dari views.py #}
+                    {% for jadwal in data_jadwal %}
+                    <tr class="hover:bg-gray-700">
+                        <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">{{ jadwal.nama_hewan }}</td>
+                        <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">{{ jadwal.tgl_pemeriksaan_selanjutnya|date:"Y-m-d" }}</td>
+                        <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+                            {% if jadwal.freq_pemeriksaan_rutin %}
+                                {{ jadwal.freq_pemeriksaan_rutin }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+                            <button onclick="openEditModal('{{ jadwal.id_hewan }}', '{{ jadwal.nama_hewan }}', '{{ jadwal.tgl_pemeriksaan_selanjutnya|date:"Y-m-d" }}', '{{ jadwal.freq_pemeriksaan_rutin }}')"
+                                    class="text-blue-400 hover:text-blue-600 mr-2">Edit</button>
+                            <button onclick="confirmDelete('{{ jadwal.id_hewan }}', '{{ jadwal.tgl_pemeriksaan_selanjutnya|date:"Y-m-d" }}')"
+                                    class="text-red-400 hover:text-red-600">Hapus</button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">Tidak ada jadwal pemeriksaan.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
     </div>
-
-    <!-- Tombol Tambah -->
-    <div class="flex justify-end mb-4">
-      <button id="tambahJadwalBtn" class="text-blue-600 hover:underline font-semibold">
-        [+ Tambah Jadwal Pemeriksaan]
-      </button>
-    </div>
-
-    <!-- Tabel Jadwal -->
-    <div class="overflow-x-auto">
-      <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100">
-        <thead class="bg-gray-200 dark:bg-gray-700">
-          <tr>
-            <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
-              Tanggal Pemeriksaan Selanjutnya
-            </th>
-          </tr>
-        </thead>
-        <tbody id="jadwalTable">
-          <tr>
-            <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
-              2025-03-20
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </div>
 </div>
 
-<!-- Modal Tambah Jadwal -->
-<div id="tambahJadwalModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
-    <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">
-      TAMBAH JADWAL
-    </h2>
+<div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+        <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">
+            TAMBAH JADWAL
+        </h2>
+        <form method="POST" action="{% url 'jadwal_pemeriksaan' %}">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="id_hewan_add" class="block text-gray-700 dark:text-gray-300 mb-2">
+                    ID Hewan:
+                </label>
+                <input type="text" id="id_hewan_add" name="id_hewan"
+                       class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
+                       placeholder="Masukkan ID Hewan (UUID)" required>
+                {# Opsi: bisa jadi <select> jika daftar hewan tidak terlalu banyak #}
+            </div>
+            <div class="mb-4">
+                <label for="tanggal_awal_add" class="block text-gray-700 dark:text-gray-300 mb-2">
+                    Tanggal Awal Pemeriksaan:
+                </label>
+                <input type="date" id="tanggal_awal_add" name="tanggal_awal"
+                       class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
+                       required>
+            </div>
+            <div class="mb-6">
+                <label for="frekuensi_add" class="block text-gray-700 dark:text-gray-300 mb-2">
+                    Frekuensi (x bulan sekali):
+                </label>
+                <input type="number" id="frekuensi_add" name="frekuensi" min="1"
+                       class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
+                       placeholder="Contoh: 1, 2, 3, 4, 6, 12" required>
+            </div>
 
-    <div class="mb-4">
-      <label for="inputTanggalJadwal" class="block text-gray-700 dark:text-gray-300 mb-2">
-        Tanggal Pemeriksaan Selanjutnya:
-      </label>
-      <input type="date" id="inputTanggalJadwal" class="w-full border rounded p-2">
+            <div class="flex justify-center space-x-6 mt-6">
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">SIMPAN</button>
+                <button type="button" id="cancelAdd" class="px-4 py-2 border rounded text-gray-700 dark:text-gray-300">BATAL</button>
+            </div>
+        </form>
     </div>
-
-    <div class="flex justify-center space-x-6 mt-6">
-      <button id="saveJadwalBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">SIMPAN</button>
-      <button id="batalBtn" class="px-4 py-2 border rounded text-gray-700 dark:text-gray-300">BATAL</button>
-    </div>
-  </div>
 </div>
+
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+        <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">
+            EDIT JADWAL PEMERIKSAAN
+        </h2>
+        <form method="POST" action="{% url 'update_jadwal_pemeriksaan' %}">
+            {% csrf_token %}
+            <input type="hidden" id="edit_id_hewan_original" name="id_hewan_original">
+            <input type="hidden" id="edit_tgl_original" name="tgl_original">
+
+            <div class="mb-4">
+                <label for="edit_nama_hewan" class="block text-gray-700 dark:text-gray-300 mb-2">Nama Hewan:</label>
+                <input type="text" id="edit_nama_hewan" name="nama_hewan_display" readonly
+                       class="w-full border rounded p-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed">
+            </div>
+            <div class="mb-4">
+                <label for="edit_tgl_pemeriksaan" class="block text-gray-700 dark:text-gray-300 mb-2">Tanggal Pemeriksaan Selanjutnya:</label>
+                <input type="date" id="edit_tgl_pemeriksaan" name="tgl_pemeriksaan_display" readonly
+                       class="w-full border rounded p-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed">
+            </div>
+            <div class="mb-6">
+                <label for="edit_frekuensi" class="block text-gray-700 dark:text-gray-300 mb-2">
+                    Frekuensi Pemeriksaan Rutin (x bulan sekali):
+                </label>
+                <input type="number" id="edit_frekuensi" name="frekuensi" min="1"
+                       class="w-full border rounded p-2 bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
+                       required>
+            </div>
+            <div class="flex justify-center space-x-6 mt-6">
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">SIMPAN</button>
+                <button type="button" id="cancelEdit" class="px-4 py-2 border rounded text-gray-700 dark:text-gray-300">BATAL</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="deleteConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+        <p class="text-gray-800 dark:text-gray-100 text-lg mb-6">Apakah Anda yakin ingin menghapus jadwal pemeriksaan ini?</p>
+        <div class="flex justify-around">
+            <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                Ya, Hapus
+            </button>
+            <button id="cancelDeleteBtn" class="px-4 py-2 border rounded text-gray-700 dark:text-gray-300">
+                Batal
+            </button>
+        </div>
+    </div>
+</div>
+
 
 <script>
-  const tambahJadwalBtn = document.getElementById('tambahJadwalBtn');
-  const tambahJadwalModal = document.getElementById('tambahJadwalModal');
-  const saveJadwalBtn = document.getElementById('saveJadwalBtn');
-  const batalBtn = document.getElementById('batalBtn');
-  const inputTanggalJadwal = document.getElementById('inputTanggalJadwal');
-  const jadwalTable = document.getElementById('jadwalTable');
+    // --- Variabel DOM ---
+    const openAddModalBtn = document.getElementById('openAddModal');
+    const addModal = document.getElementById('addModal');
+    const cancelAddBtn = document.getElementById('cancelAdd');
 
-  tambahJadwalBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    tambahJadwalModal.classList.remove('hidden');
-    tambahJadwalModal.classList.add('flex');
-  });
+    const editModal = document.getElementById('editModal');
+    const cancelEditBtn = document.getElementById('cancelEdit');
 
-  batalBtn.addEventListener('click', () => {
-    closeTambahJadwal();
-  });
+    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
-  function closeTambahJadwal() {
-    tambahJadwalModal.classList.add('hidden');
-    tambahJadwalModal.classList.remove('flex');
-    inputTanggalJadwal.value = '';
-  }
-
-  saveJadwalBtn.addEventListener('click', () => {
-    const tanggal = inputTanggalJadwal.value;
-    const today = new Date().toISOString().split('T')[0];
-
-    if (!tanggal) {
-      alert('Silakan pilih tanggal terlebih dahulu.');
-      return;
-    }
-
-    if (tanggal < today) {
-      alert('Tdak dapat memilih tanggal di masa lalu.');
-      return;
-    }
-
-    addTanggalKeTabel(tanggal);
-    closeTambahJadwal();
-    alert('Jadwal berhasil ditambahkan.');
-  });
-
-  function addTanggalKeTabel(tanggal) {
-    // Tambahkan tanggal baru
-    const newRow = document.createElement('tr');
-    newRow.innerHTML = `
-      <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">${tanggal}</td>
-    `;
-    jadwalTable.appendChild(newRow);
-
-    // Urutkan tabel
-    sortTableByDate();
-  }
-
-  function sortTableByDate() {
-    let rows = Array.from(jadwalTable.querySelectorAll('tr'));
-
-    rows.sort((a, b) => {
-      const dateA = new Date(a.children[0].textContent.trim());
-      const dateB = new Date(b.children[0].textContent.trim());
-      return dateA - dateB;
+    // --- Tambah Jadwal Modal ---
+    openAddModalBtn.addEventListener('click', () => {
+        addModal.classList.remove('hidden');
+        addModal.classList.add('flex'); // Gunakan flex untuk centering
     });
 
-    jadwalTable.innerHTML = '';
-    rows.forEach(row => jadwalTable.appendChild(row));
-  }
+    cancelAddBtn.addEventListener('click', () => {
+        addModal.classList.add('hidden');
+        addModal.classList.remove('flex');
+        // Reset form jika perlu
+        document.getElementById('id_hewan_add').value = '';
+        document.getElementById('tanggal_awal_add').value = '';
+        document.getElementById('frekuensi_add').value = '';
+    });
+
+    // --- Edit Jadwal Modal ---
+    function openEditModal(idHewan, namaHewan, tanggalPemeriksaan, frekuensi) {
+        document.getElementById('edit_id_hewan_original').value = idHewan;
+        document.getElementById('edit_tgl_original').value = tanggalPemeriksaan; // Tanggal asli sebagai PK
+        document.getElementById('edit_nama_hewan').value = namaHewan; // Nama hewan untuk display
+        document.getElementById('edit_tgl_pemeriksaan').value = tanggalPemeriksaan; // Tanggal pemeriksaan untuk display
+        document.getElementById('edit_frekuensi').value = frekuensi;
+
+        editModal.classList.remove('hidden');
+        editModal.classList.add('flex');
+    }
+
+    cancelEditBtn.addEventListener('click', () => {
+        editModal.classList.add('hidden');
+        editModal.classList.remove('flex');
+    });
+
+    // --- Hapus Jadwal Modal ---
+    let idHewanToDelete = null;
+    let tglPemeriksaanToDelete = null;
+
+    function confirmDelete(idHewan, tanggalPemeriksaan) {
+        idHewanToDelete = idHewan;
+        tglPemeriksaanToDelete = tanggalPemeriksaan;
+        deleteConfirmModal.classList.remove('hidden');
+        deleteConfirmModal.classList.add('flex');
+    }
+
+    confirmDeleteBtn.addEventListener('click', () => {
+        // Redirect ke URL DELETE dengan parameter
+        window.location.href = `/delete_jadwal_pemeriksaan/?id_hewan=${idHewanToDelete}&tanggal=${tglPemeriksaanToDelete}`;
+    });
+
+    cancelDeleteBtn.addEventListener('click', () => {
+        deleteConfirmModal.classList.add('hidden');
+        deleteConfirmModal.classList.remove('flex');
+        idHewanToDelete = null;
+        tglPemeriksaanToDelete = null;
+    });
+
+    // --- Sorting Tabel (Hanya untuk tampilan JS di frontend, tidak simpan ke DB) ---
+    // (Kode ini dari sebelumnya, tidak relevan untuk interaksi backend secara langsung)
+    // function sortTableByDate() {
+    //     let rows = Array.from(jadwalTableBody.querySelectorAll('tr'));
+    //     rows.sort((a, b) => {
+    //         const dateA = new Date(a.children[1].textContent.trim()); // children[1] karena ada kolom Nama Hewan sekarang
+    //         const dateB = new Date(b.children[1].textContent.trim());
+    //         return dateA - dateB;
+    //     });
+    //     jadwalTableBody.innerHTML = '';
+    //     rows.forEach(row => jadwalTableBody.appendChild(row));
+    // }
+
+    // Catatan: Fungsi addTanggalKeTabel dan sortTableByDate dari skrip lama
+    // tidak lagi relevan secara langsung setelah Anda mengintegrasikan backend.
+    // Data tabel akan direfresh dari server setelah POST/DELETE sukses.
 </script>
 
 {% endblock content %}
