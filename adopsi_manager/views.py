@@ -416,22 +416,8 @@ def cancel_adopsi(request, id_adopter, id_hewan, tgl_mulai_adopsi):
 @login_required_custom
 @allowed_roles(['pengunjung', 'pengunjung_adopter'])
 def program_adopsi(request):
-    username = request.session.get('username')
-    role     = get_user_role(username)
+    adopter_id = request.session.get('adopter_id')
 
-    # jika dia adopter, lookup id_adopter
-    adopter_id = None
-    if role == 'pengunjung_adopter':
-        with connection.cursor() as cur:
-            cur.execute(
-                "SELECT id_adopter FROM ADOPTER WHERE username_adopter = %s",
-                [username]
-            )
-            row = cur.fetchone()
-            if row:
-                adopter_id = row[0]
-
-    # ambil semua hewan + foto
     with connection.cursor() as cur:
         cur.execute("""
             SELECT id, nama, spesies, status_kesehatan, url_foto
@@ -442,84 +428,90 @@ def program_adopsi(request):
 
     adopsi_list = []
     with connection.cursor() as cur:
-        for id_hewan, nama, jenis, kondisi, foto_url in hewan_rows:
+        for id_hewan, nama, jenis, kondisi, url_foto in hewan_rows:
+            cur.execute("""
+                SELECT tgl_mulai_adopsi
+                  FROM ADOPSI
+                 WHERE id_adopter = %s
+                   AND id_hewan   = %s
+            """, [adopter_id, id_hewan])
+            row = cur.fetchone()
+
+            if row:
+                tgl = row[0].strftime('%Y-%m-%d')
+                adopsi_list.append({
+                    'id_adopter':       adopter_id,
+                    'id_hewan':         id_hewan,
+                    'tgl_mulai_adopsi': tgl,
+                    'foto_url':         url_foto,
+                    'nama_hewan':       nama,
+                    'jenis':            jenis,
+                    'kondisi':          kondisi,
+                })
+            else:
+                adopsi_list.append({
+                    'id_adopter':       None,
+                    'id_hewan':         id_hewan,
+                    'tgl_mulai_adopsi': None,
+                    'foto_url':         url_foto,
+                    'nama_hewan':       nama,
+                    'jenis':            jenis,
+                    'kondisi':          kondisi,
+                })
+
+    return render(request, 'program_adopsi.html', {
+        'role':        get_user_role(request.session.get('username')),
+        'adopsi_list': adopsi_list,
+    })
+
+
+@login_required_custom
+@allowed_roles(['pengunjung', 'pengunjung_adopter'])
+def program_adopsi(request):
+    username = request.session['username']
+    # Cari id_adopter dari username
+    with connection.cursor() as cur:
+        cur.execute("SELECT id_adopter FROM ADOPTER WHERE username_adopter = %s", [username])
+        row = cur.fetchone()
+    adopter_id = row[0] if row else None
+
+    # Ambil semua hewan
+    with connection.cursor() as cur:
+        cur.execute("""
+            SELECT id, nama, spesies, status_kesehatan, url_foto
+            FROM HEWAN
+            ORDER BY nama
+        """)
+        hewan_rows = cur.fetchall()
+
+    adopsi_list = []
+    with connection.cursor() as cur:
+        for id_hewan, nama, spesies, kondisi, foto_url in hewan_rows:
             # cek adopsi
             tgl_mulai = None
             if adopter_id:
                 cur.execute("""
                     SELECT tgl_mulai_adopsi
-                      FROM ADOPSI
-                     WHERE id_adopter = %s
-                       AND id_hewan   = %s
+                    FROM ADOPSI
+                    WHERE id_adopter = %s AND id_hewan = %s
                 """, [adopter_id, id_hewan])
                 r = cur.fetchone()
                 if r:
                     tgl_mulai = r[0].strftime('%Y-%m-%d')
-
-            adopsi_list.append({
-                'foto_url':          foto_url,
-                'nama_hewan':        nama,
-                'jenis':             jenis,
-                'kondisi':           kondisi,
-                'adopter':           bool(tgl_mulai),
-                'id_adopter':        adopter_id,
-                'id_hewan':          id_hewan,
-                'tgl_mulai_adopsi':  tgl_mulai,
-            })
-
-    return render(request, 'program_adopsi.html', {
-        'role':          role,
-        'adopsi_list':   adopsi_list,
-    })
-
-
-@login_required_custom
-@allowed_roles(['pengunjung_adopter'])
-def program_adopsi(request):
-    username = request.session.get('username')
-
-    # Ambil id_adopter dari tabel ADOPTER
-    with connection.cursor() as cur:
-        cur.execute(
-            "SELECT id_adopter FROM ADOPTER WHERE username_adopter = %s",
-            [username]
-        )
-        row = cur.fetchone()
-        if not row:
-            # Belum pernah adopsi sama sekali
-            adopsi_rows = []
-        else:
-            adopter_id = row[0]
-            # Ambil semua adopsi milik adopter ini
-            cur.execute("""
-                SELECT
-                  ap.id_hewan,
-                  h.nama,
-                  h.spesies,
-                  h.url_foto,
-                  ap.tgl_mulai_adopsi
-                FROM ADOPSI ap
-                JOIN HEWAN h ON h.id = ap.id_hewan
-                WHERE ap.id_adopter = %s
-                ORDER BY ap.tgl_mulai_adopsi DESC
-            """, [adopter_id])
-            adopsi_rows = cur.fetchall()
-
-    # Bangun context list
-    adopsi_list = []
-    for id_hewan, nama, spesies, foto_url, tgl_mulai in adopsi_rows:
-        adopsi_list.append({
-            'id_adopter':        adopter_id,
-            'id_hewan':          id_hewan,
-            'nama_hewan':        nama,
-            'jenis':             spesies,
-            'foto_url':          foto_url,
-            'tgl_mulai_adopsi':  tgl_mulai.strftime('%Y-%m-%d'),
-        })
+            if tgl_mulai:
+                adopsi_list.append({
+                    'id_adopter':       adopter_id,
+                    'id_hewan':         id_hewan,
+                    'tgl_mulai_adopsi': tgl_mulai,
+                    'nama_hewan':       nama,
+                    'jenis':            spesies,
+                    'kondisi':          kondisi,
+                    'foto_url':         foto_url,
+                })
 
     return render(request, 'program_adopsi.html', {
-        'role':         get_user_role(username),
-        'adopsi_list':  adopsi_list,
+        'role':         get_user_role(request.session.get('username')),
+        'adopsi_list':  adopsi_list,   
     })
 
 
