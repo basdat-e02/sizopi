@@ -51,13 +51,10 @@
 
       <div class="shrink-0 pt-1">
         {% if a.tgl_mulai_adopsi %}
-          <a href="{% url 'detail_adopsi_adopter'
-                       a.id_adopter
-                       a.id_hewan
-                       a.tgl_mulai_adopsi|date:'Y-m-d' %}"
-             class="text-blue-600 dark:text-blue-400 hover:underline">
-             Lihat Detail
-          </a>
+          <a href="{% url 'detail_adopsi_adopter' a.id_adopter a.id_hewan a.tgl_mulai_adopsi %}"
+               class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+              Lihat Detail
+            </a>
         {% else %}
           <span class="text-gray-500 dark:text-gray-400">—</span>
         {% endif %}
