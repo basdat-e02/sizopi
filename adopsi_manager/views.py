@@ -744,10 +744,38 @@ def daftar_adopter(request):
     # =================================================
     # B.  GET  ➜ tampilkan daftar
     # =================================================
+    # --- GET: ambil data adopter + agregat langsung, TANPA view -------------
     with connection.cursor() as cur:
-        cur.execute("SELECT * FROM v_adopter_stats")
+        cur.execute("""
+            WITH a AS (
+                SELECT  id_adopter,
+                        SUM(CASE WHEN status_pembayaran ILIKE 'lunas'
+                                THEN kontribusi_finansial ELSE 0 END)         AS total_lunas,
+                        SUM(CASE WHEN status_pembayaran ILIKE 'lunas'
+                                AND tgl_mulai_adopsi >= CURRENT_DATE - INTERVAL '1 year'
+                                THEN kontribusi_finansial ELSE 0 END)         AS last_year_lunas,
+                        BOOL_OR (CURRENT_DATE BETWEEN tgl_mulai_adopsi
+                                                AND tgl_berhenti_adopsi)       AS masih_aktif
+                FROM    adopsi
+                GROUP   BY id_adopter
+            )
+            SELECT  ad.id_adopter,
+                    COALESCE(i.nama, o.nama_organisasi)            AS nama,
+                    CASE WHEN i.id_adopter IS NOT NULL
+                        THEN 'individu' ELSE 'organisasi' END     AS tipe,
+                    a.total_lunas,
+                    a.last_year_lunas,
+                    a.masih_aktif
+            FROM    adopter ad
+            JOIN    a ON a.id_adopter = ad.id_adopter      -- hanya adopter yg pernah lunas
+            LEFT    JOIN individu   i ON i.id_adopter = ad.id_adopter
+            LEFT    JOIN organisasi o ON o.id_adopter = ad.id_adopter
+            WHERE   a.total_lunas > 0                      -- buang kontribusi 0
+        """)
         rows = cur.fetchall()
-        # kolom: (id_adopter, nama, tipe, total_lunas, last_year_lunas, masih_aktif)
+        # kolom: (id_adopter, nama, tipe, total_lunas,
+        #         last_year_lunas, masih_aktif)
+
 
     individu, organisasi = [], []
     for r in rows:
