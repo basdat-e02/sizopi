@@ -34,13 +34,15 @@
  
        {% elif role == "penjaga hewan" %}
          <li><a class="nav-link">Catatan Perawatan</a></li>
+         <li><a href="{% url 'pemberian_pakan' %}" class="nav-link">Pemberian Pakan</a></li>
+         <li><a href="{% url 'riwayat_pemberian_pakan' %}" class="nav-link">Riwayat Pemberian Pakan</a></li>
          <li><a href="{% url 'view_satwa' %}" class="nav-link">Data Satwa</a></li>
          <li><a href="{% url 'view_habitat' %}" class="nav-link">Daftar Habitat</a></li>
  
        {% elif role == "staf admin" %}
-         <li><a class="nav-link">Kelola Pengunjung</a></li>
-         <li><a class="nav-link">Kelola Adopsi</a></li>
-         <li><a class="nav-link">Kelola Adopter</a></li>
+         <li><a href="" class="nav-link">Kelola Pengunjung</a></li>
+         <li><a href="{% url 'adopsi_manager:view_adopsi' %}" class="nav-link">Kelola Adopsi</a></li>
+         <li><a href="{% url 'adopsi_manager:daftar_adopter' %}" class="nav-link">Kelola Adopter</a></li>
          <li><a class="nav-link" href="{% url 'manajemen_atraksi:atraksi_list' %}">Kelola Atraksi</a></li>
          <li><a class="nav-link" href="{% url 'manajemen_atraksi:wahana_list' %}">Kelola Wahana</a></li>
          <li><a class="nav-link" href="{% url 'manajemen_atraksi:list_semua_reservasi' %}">Kelola Reservasi</a></li>
@@ -51,11 +53,11 @@
          <li><a class="nav-link">Jadwal Pertunjukan</a></li>
  
        {% elif role == "pengunjung" or role == "pengunjung_adopter"%}
-         <li><a class="nav-link">Info Kebun</a></li>
+         <li><a class="nav-link">Info Kebun Binatang</a></li>
          <li><a class="nav-link" href="{% url 'manajemen_atraksi:list_reservasi_pengunjung' %}">Reservasi Tiket</a></li>
  
           {% if role == "pengunjung_adopter" %}
-            <li><a href="{% url 'view_adopsi' %}" class="nav-link">Hewan Adopsi</a></li>
+            <li><a href="{% url 'adopsi:program_adopsi' %}" class="nav-link">Hewan Adopsi</a></li>
           {% endif %}
        {% endif %}
  
