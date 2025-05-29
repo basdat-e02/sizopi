@@ -77,6 +77,10 @@ urlpatterns = [
     ),
 
     # — Statistik & Riwayat — #
-    path('daftar-adopter/', daftar_adopter, name='daftar_adopter'),
-    path('riwayat-adopsi/<str:nama>/', riwayat_adopsi_adopter, name='riwayat_adopsi_adopter'),
+    path('daftar-adopter/',  daftar_adopter,   name='daftar_adopter'),
+    # urls.py
+path("riwayat-adopsi/<uuid:id_adopter>/",
+     riwayat_adopsi_adopter,
+     name="riwayat_adopsi_adopter"),
+
 ]

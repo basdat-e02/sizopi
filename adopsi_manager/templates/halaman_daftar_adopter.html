@@ -1,47 +1,43 @@
 {% extends "base.html" %}
 {% load humanize %}
 {% block meta %}<title>Daftar Adopter</title>{% endblock meta %}
+
 {% block content %}
 {% include "navbar.html" %}
 
 <div class="min-h-screen py-12 px-6 bg-gray-100 dark:bg-gray-900">
   <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-    <h1 class="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">
-      Adopter dengan Total Kontribusi Tertinggi
-    </h1>
-    <ol class="list-decimal list-inside mb-8 text-gray-700 dark:text-gray-300">
-      {% for a in top5 %}
-        <li>{{ a.nama }} – Rp{{ a.total|intcomma }}</li>
-      {% endfor %}
-    </ol>
 
-    <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Daftar Adopter</h2>
-    <table class="w-full table-auto text-sm text-gray-800 dark:text-gray-100 border">
-      <thead class="bg-gray-200 dark:bg-gray-700 font-semibold">
-        <tr>
-          <th class="border px-4 py-2">Nama Adopter</th>
-          <th class="border px-4 py-2">Total Kontribusi</th>
-          <th class="border px-4 py-2">Riwayat Adopsi</th>
-          <th class="border px-4 py-2">Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for a in adopters %}
-        <tr class="bg-white dark:bg-gray-800">
-          <td class="border px-4 py-2">{{ a.nama }}</td>
-          <td class="border px-4 py-2">Rp{{ a.total|intcomma }}</td>
-          <td class="border px-4 py-2">
-            <a href="{% url 'riwayat_adopsi_adopter' a.nama %}" class="text-blue-500 hover:underline">
-              Lihat Detail
-            </a>
-          </td>
-          <td class="border px-4 py-2">
-            <a href="#" class="text-red-500 hover:underline">Hapus</a>
-          </td>
-        </tr>
+    <!-- Top-5 Kontribusi -->
+    <h1 class="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+      Adopter dengan Total Kontribusi Tertinggi dalam Setahun Terakhir
+    </h1>
+
+    {% if top5 %}
+      <ol class="list-decimal list-inside mb-10 text-gray-700 dark:text-gray-300">
+        {% for a in top5 %}
+          <li>{{ a.nama }} – Rp{{ a.total|intcomma }}</li>
         {% endfor %}
-      </tbody>
-    </table>
+      </ol>
+    {% else %}
+      <p class="italic text-gray-400 mb-10">
+        Belum ada adopter yang berkontribusi dalam satu tahun terakhir.
+      </p>
+    {% endif %}
+
+
+    <!-- ===== INDIVIDU ===== -->
+    <h2 class="text-xl font-semibold mb-3 text-gray-800 dark:text-gray-100">
+      Daftar Adopter Individu
+    </h2>
+    {% include "partials/_table_adopter.html" with data=adopters_individu %}
+
+    <!-- ===== ORGANISASI ===== -->
+    <h2 class="text-xl font-semibold my-5 text-gray-800 dark:text-gray-100">
+      Daftar Adopter Organisasi
+    </h2>
+    {% include "partials/_table_adopter.html" with data=adopters_organisasi %}
+
   </div>
 </div>
 {% endblock content %}

@@ -1,6 +1,9 @@
+from email.utils import parsedate
+from pyexpat.errors import messages
 from django.shortcuts import render, redirect
 from django.db import transaction
 from django.db import connection
+from main.views import allowed_roles, login_required_custom
 
 def execute_query(query, params=None, fetch=False):
     with connection.cursor() as cursor:
@@ -18,14 +21,22 @@ def get_pelatih_list():
 
     return execute_query(query, fetch=True)
 
+
+
 def get_hewan_list():
-    query = "SELECT nama FROM HEWAN;"
-    return execute_query(query, fetch=True)
+    query = "SELECT id, nama FROM hewan"
+    hewan_list = execute_query(query, fetch=True)
+    print(hewan_list)  # cek output
+    return hewan_list
+
+
+
 def get_pelatih_choices():
     with connection.cursor() as cursor:
-        cursor.execute("SELECT username, nama_depan, nama_belakang FROM PELATIH_HEWAN")
+        cursor.execute("SELECT username_lh FROM PELATIH_HEWAN")
         result = cursor.fetchall()
-    return [(row[0], f'{row[1]} {row[2]}') for row in result]  # Menggabungkan nama depan dan belakang
+    # Convert the result (list of tuples) to a list of strings
+    return [item[0] for item in result]
 
 def get_hewan_choices():
     with connection.cursor() as cursor:
@@ -57,6 +68,8 @@ def get_hewan_by_atraksi(nama):
     """
     result = execute_query(query, [nama], fetch=True)
     return [row['id_hewan'] for row in result]
+@login_required_custom
+@allowed_roles(["staf admin"])
 def atraksi_list(request):
     query = """
     SELECT 
@@ -64,7 +77,7 @@ def atraksi_list(request):
         a.lokasi,
         f.jadwal,
         f.kapasitas_max AS kapasitas,
-        STRING_AGG(DISTINCT p.nama_depan || ' ' || COALESCE(p.nama_tengah || ' ', '') || p.nama_belakang, ', ') AS pelatih,
+        STRING_AGG(DISTINCT ph.username_lh, ', ') AS pelatih,
         STRING_AGG(DISTINCT h.nama, ', ') AS hewan
     FROM atraksi a
     JOIN fasilitas f ON a.nama_atraksi = f.nama
@@ -79,9 +92,9 @@ def atraksi_list(request):
     
     return render(request, 'atraksi_list.html', {
         "atraksi_list": atraksi_list,
-        "role": "staf admin"
     })
-
+@login_required_custom
+@allowed_roles(["staf admin"])
 @transaction.atomic
 def atraksi_create(request):
     if request.method == 'POST':
@@ -91,7 +104,7 @@ def atraksi_create(request):
             jadwal = request.POST.get('jadwal')
             kapasitas = request.POST.get('kapasitas')
             lokasi = request.POST.get('lokasi')
-            pelatih = request.POST.get('pelatih')
+            pelatih = request.POST.getlist('pelatih')
             hewan_ids = request.POST.getlist('hewan')
             # 1. Insert ke FASILITAS
             query_fasilitas = """
@@ -107,21 +120,51 @@ def atraksi_create(request):
             """
             execute_query(query_atraksi, [nama, lokasi])
             
-            # 3. Insert jadwal penugasan pelatih (jika ada pelatih)
+ # 3. Update pelatih
+            execute_query(
+                "DELETE FROM jadwal_penugasan WHERE nama_atraksi = %s", 
+                [nama]
+            )
             if pelatih:
-                query_penugasan = """
-                INSERT INTO jadwal_penugasan (username_lh, tgl_penugasan, nama_atraksi)
-                VALUES (%s, NOW(), %s)
-                """
-                execute_query(query_penugasan, [pelatih, nama])
+                for username in pelatih:
+                    if username:
+                        # Simpan jumlah penugasan sebelum insert
+                        before = execute_query(
+                            "SELECT COUNT(*) FROM jadwal_penugasan WHERE username_lh = %s AND nama_atraksi = %s",
+                            [username, nama],
+                            fetch=True
+                        )[0]['count']
+                        
+                        # Coba insert
+                        execute_query(
+                            "INSERT INTO jadwal_penugasan (username_lh, tgl_penugasan, nama_atraksi) VALUES (%s, NOW(), %s)",
+                            [username, nama]
+                        )
+                        
+                        # Cek apakah benar-benar masuk
+                        after = execute_query(
+                            "SELECT COUNT(*) FROM jadwal_penugasan WHERE username_lh = %s AND nama_atraksi = %s",
+                            [username, nama],
+                            fetch=True
+                        )[0]['count']
+                        
+                        if after == before:
+                            messages.warning(request, f"Pelatih {username} tidak ditambahkan karena sudah bertugas lebih dari 3 bulan di atraksi ini.")
+            print(request.POST)
+            print(request.POST.getlist('hewan'))
+
             
-            # 4. Insert hewan yang berpartisipasi (jika ada hewan)
+            # 4. Update hewan
+            execute_query(
+                "DELETE FROM berpartisipasi WHERE nama_fasilitas = %s", 
+                [nama]
+            )
             for hewan_id in hewan_ids:
-                query_berpartisipasi = """
-                INSERT INTO berpartisipasi (nama_fasilitas, id_hewan)
-                VALUES (%s, %s)
-                """
-                execute_query(query_berpartisipasi, [nama, hewan_id])
+                if hewan_id:  
+                    execute_query(
+            "INSERT INTO berpartisipasi (nama_fasilitas, id_hewan) VALUES (%s, %s)",
+                        [nama, hewan_id]
+                    )
             
             # Jika semua query berhasil, redirect ke daftar atraksi
             return redirect('manajemen_atraksi:atraksi_list')
@@ -133,7 +176,6 @@ def atraksi_create(request):
                 "action": "Tambah",
                 "pelatih_list": get_pelatih_list(),
                 "hewan_list": get_hewan_list(),
-                "role": "staf admin"
             })
     
     # Jika bukan POST, tampilkan halaman form untuk tambah atraksi
@@ -141,16 +183,16 @@ def atraksi_create(request):
         "action": "Tambah",
         "pelatih_list": get_pelatih_list(),
         "hewan_list": get_hewan_list(),
-        "role": "staf admin"
     })
-
+@login_required_custom
+@allowed_roles(["staf admin"])
 @transaction.atomic
 def atraksi_update(request, nama):
     if request.method == 'POST':
         lokasi = request.POST.get('lokasi')
         kapasitas = request.POST.get('kapasitas')
         jadwal = request.POST.get('jadwal')
-        pelatih = request.POST.get('pelatih')
+        pelatih = request.POST.getlist('pelatih')
         hewan_ids = request.POST.getlist('hewan')
         
         try:
@@ -176,10 +218,33 @@ def atraksi_update(request, nama):
                 [nama]
             )
             if pelatih:
-                execute_query(
-                    "INSERT INTO jadwal_penugasan (username_lh, tgl_penugasan, nama_atraksi) VALUES (%s, NOW(), %s)",
-                    [pelatih, nama]
-                )
+                for username in pelatih:
+                    if username:
+                        # Simpan jumlah penugasan sebelum insert
+                        before = execute_query(
+                            "SELECT COUNT(*) FROM jadwal_penugasan WHERE username_lh = %s AND nama_atraksi = %s",
+                            [username, nama],
+                            fetch=True
+                        )[0]['count']
+                        
+                        # Coba insert
+                        execute_query(
+                            "INSERT INTO jadwal_penugasan (username_lh, tgl_penugasan, nama_atraksi) VALUES (%s, NOW(), %s)",
+                            [username, nama]
+                        )
+                        
+                        # Cek apakah benar-benar masuk
+                        after = execute_query(
+                            "SELECT COUNT(*) FROM jadwal_penugasan WHERE username_lh = %s AND nama_atraksi = %s",
+                            [username, nama],
+                            fetch=True
+                        )[0]['count']
+                        
+                        if after == before:
+                            messages.warning(request, f"Pelatih {username} tidak ditambahkan karena sudah bertugas lebih dari 3 bulan di atraksi ini.")
+            print(request.POST)
+            print(request.POST.getlist('hewan'))
+
             
             # 4. Update hewan
             execute_query(
@@ -187,10 +252,12 @@ def atraksi_update(request, nama):
                 [nama]
             )
             for hewan_id in hewan_ids:
-                execute_query(
-                    "INSERT INTO berpartisipasi (nama_fasilitas, id_hewan) VALUES (%s, %s)",
-                    [nama, hewan_id]
-                )
+                if hewan_id:  
+                    execute_query(
+            "INSERT INTO berpartisipasi (nama_fasilitas, id_hewan) VALUES (%s, %s)",
+                        [nama, hewan_id]
+                    )
+
             
             return redirect('manajemen_atraksi:atraksi_list')
             
@@ -203,7 +270,6 @@ def atraksi_update(request, nama):
                 "action": "Edit",
                 "pelatih_list": get_pelatih_list(),
                 "hewan_list": get_hewan_list(),
-                "role": "staf admin"
             })
     
     atraksi = get_atraksi_by_nama(nama)
@@ -214,10 +280,10 @@ def atraksi_update(request, nama):
         "action": "Edit",
         "pelatih_list": get_pelatih_list(),
         "hewan_list": get_hewan_list(),
-        "role": "staf admin"
     })
 
-
+@login_required_custom
+@allowed_roles(["staf admin"])
 @transaction.atomic
 def atraksi_delete(request, nama):
     if request.method == 'POST':
@@ -244,19 +310,18 @@ def atraksi_delete(request, nama):
             return render(request, 'atraksi_confirm_delete.html', {
                 "error": str(e),
                 "atraksi": atraksi,
-                "role": "staf admin"
             })
 
     # Jika bukan POST, tampilkan halaman konfirmasi penghapusan
     atraksi = get_atraksi_by_nama(nama)
     return render(request, 'atraksi_confirm_delete.html', {
         "atraksi": atraksi,
-        "role": "staf admin"
     })
 
 
 
-
+@login_required_custom
+@allowed_roles(["staf admin"])
 def wahana_list(request):
     query = """
     SELECT 
@@ -275,7 +340,6 @@ def wahana_list(request):
 
     return render(request, 'wahana_list.html', {
         "wahana_list": wahana_list,
-        "role": "staf admin"
     })
 
 
@@ -309,14 +373,14 @@ def wahana_create(request):
             return render(request, 'wahana_form.html', {
                 "error": str(e),
                 "action": "Tambah",
-                "role": "staf admin"
             })
     
     return render(request, 'wahana_form.html', {
         "action": "Tambah",
-        "role": "staf admin"
     })
 
+@login_required_custom
+@allowed_roles(["staf admin"])
 @transaction.atomic
 def wahana_update(request, nama):
     if request.method == 'POST':
@@ -351,16 +415,16 @@ def wahana_update(request, nama):
                 "error": str(e),
                 "wahana": wahana,
                 "action": "Edit",
-                "role": "staf admin"
             })
     
     wahana = get_wahana_by_nama(nama)
     return render(request, 'wahana_form.html', {
         "wahana": wahana,
         "action": "Edit",
-        "role": "staf admin"
     })
 
+@login_required_custom
+@allowed_roles(["staf admin"])
 @transaction.atomic
 def wahana_delete(request, nama):
     if request.method == 'POST':
@@ -378,13 +442,11 @@ def wahana_delete(request, nama):
             return render(request, 'wahana_confirm_delete.html', {
                 "error": str(e),
                 "wahana": wahana,
-                "role": "staf admin"
             })
     
     wahana = get_wahana_by_nama(nama)
     return render(request, 'wahana_confirm_delete.html', {
         "wahana": wahana,
-        "role": "staf admin"
     })
 
 def get_wahana_by_nama(nama):
@@ -410,140 +472,359 @@ def get_wahana_by_nama(nama):
 #=========================================================================================================================#
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
 from django.db import connection
+from main.views import allowed_roles, login_required_custom
 
-def execute_query(query, params=None, fetch=False):
+
+@login_required_custom
+@allowed_roles(['pengunjung','pengunjung_adopter'])
+def list_reservasi_pengunjung(request):
+    username = request.session.get("username")
+
+    # Ambil reservasi milik pengunjung
     with connection.cursor() as cursor:
-        cursor.execute(query, params or [])
-        if fetch:
-            columns = [col[0] for col in cursor.description]
-            return [dict(zip(columns, row)) for row in cursor.fetchall()]
-        return cursor.rowcount
+        cursor.execute("""
+            SELECT r.nama_fasilitas, f.jadwal, r.jumlah_tiket, r.status, f,tanggal_kunjungan
+            FROM RESERVASI r
+            JOIN FASILITAS f ON r.nama_fasilitas = f.nama
+            WHERE r.username_p = %s
+            ORDER BY r.tanggal_kunjungan DESC
+        """, [username])
+        reservasi_saya = cursor.fetchall()
 
-def reservasi_list(request, role):
-    # Dummy data untuk testing
-    reservasi = [
-        {
-            'nama_pengunjung' : 'Agus',
-            'nama_fasilitas': 'Roller Coaster',
-            'tanggal_kunjungan': '2025-05-01',
-            'jumlah_tiket': 2,
-            'status': 'Terjadwal',
-        },
-        {
-            'nama_pengunjung' : 'Budi',
-            'nama_fasilitas': 'Rumah Hantu',
-            'tanggal_kunjungan': '2025-05-03',
-            'jumlah_tiket': 4,
-            'status': 'Terjadwal',
-        },
-    ]
-    query = """
-    SELECT 
-        w.nama_wahana AS nama,
-        f.jadwal,
-        f.kapasitas_max AS kapasitas,
-        w.peraturan
-    FROM wahana w
-    JOIN fasilitas f ON w.nama_wahana = f.nama
-    """
-    wahana_list = execute_query(query, fetch=True)
-    
-    # Split 'peraturan' into a list for each wahana
-    for wahana in wahana_list:
-        wahana['peraturan'] = wahana['peraturan'].split(",") if wahana['peraturan'] else []
+    # Ambil semua atraksi + kapasitas tersisa
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                f.nama, 
+                f.jadwal,
+                (f.kapasitas_max - COALESCE(SUM(r.jumlah_tiket), 0)) AS sisa_kapasitas,
+                f.kapasitas_max
+            FROM FASILITAS f
+            JOIN ATRAKSI a ON f.nama = a.nama_atraksi
+            LEFT JOIN RESERVASI r ON f.nama = r.nama_fasilitas AND r.status != 'Dibatalkan'
+            GROUP BY f.nama, f.jadwal, f.kapasitas_max
+            ORDER BY f.jadwal ASC
+        """)
+        reservasi_tersedia = cursor.fetchall()
 
-    # Tampilkan nama role dengan format yang diinginkan
-    role_display = {
-        'staf': 'staf admin',
-        'pengunjung': 'pengunjung'
-    }.get(role, role)
+    context = {
+        "reservasi_saya": reservasi_saya,
+        "reservasi_tersedia": reservasi_tersedia,
+    }
 
-    return render(request, f'reservasi_{role}_list.html', {
-        'reservasi': reservasi,
-        'action': f'Daftar Reservasi - {role_display.capitalize()}',
-        'role': role_display,
+    return render(request, 'list_reservasi_pengunjung.html', context)
+
+from django.utils.dateparse import parse_date
+
+@login_required_custom
+@allowed_roles(['pengunjung','pengunjung_adopter'])
+def detail_reservasi(request, nama_fasilitas, tanggal):
+    username = request.session.get("username")
+    tanggal_kunjungan = parse_date(tanggal)  # convert dari string ke date object
+
+    if not tanggal_kunjungan:
+        print("❌ Format tanggal tidak valid:", tanggal)
+        return redirect('manajemen_atraksi:list_reservasi_pengunjung')
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT r.nama_fasilitas, r.tanggal_kunjungan, r.jumlah_tiket, r.status, f.jadwal
+            FROM RESERVASI r
+            JOIN FASILITAS f ON r.nama_fasilitas = f.nama
+            WHERE r.username_p = %s
+            AND r.nama_fasilitas = %s
+            AND r.tanggal_kunjungan = %s
+        """, [username, nama_fasilitas, tanggal_kunjungan])
+        detail = cursor.fetchone()
+
+    if not detail:
+        print("❌ Reservasi tidak ditemukan:", nama_fasilitas, tanggal)
+        return redirect('manajemen_atraksi:list_reservasi_pengunjung')
+
+    context = {
+        "reservasi": detail  # [nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status, jadwal_fasilitas]
+    }
+    return render(request, 'detail_reservasi.html', context)
+
+from urllib.parse import unquote
+from datetime import datetime
+@login_required_custom
+@allowed_roles(['pengunjung','pengunjung_adopter'])
+def edit_reservasi(request, nama_fasilitas, tanggal):
+    username = request.session.get("username")
+
+    # Decode fasilitas dan parse tanggal
+    nama_fasilitas = unquote(nama_fasilitas)
+    try:
+        tanggal_obj = datetime.strptime(tanggal, "%Y-%m-%d").date()
+    except ValueError:
+        print("❌ Format tanggal tidak valid:", tanggal)
+        return redirect('manajemen_atraksi:list_reservasi_pengunjung')
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT r.nama_fasilitas, r.tanggal_kunjungan, r.jumlah_tiket
+            FROM RESERVASI r
+            WHERE r.username_p = %s 
+            AND r.nama_fasilitas = %s 
+            AND r.tanggal_kunjungan = %s
+        """, [username, nama_fasilitas, tanggal_obj])
+
+        reservasi = cursor.fetchone()
+
+        if reservasi is None:
+            print("❌ Reservasi tidak ditemukan:", nama_fasilitas, tanggal)
+            return redirect('manajemen_atraksi:list_reservasi_pengunjung')
+
+        cursor.execute("""
+            SELECT a.nama_atraksi
+            FROM ATRAKSI a
+            JOIN FASILITAS f ON a.nama_atraksi = f.nama
+        """)
+        wahana_list = cursor.fetchall()
+
+    context = {
+        "reservasi": reservasi,
         "wahana_list": wahana_list,
-
-    })
-
-
-# Reservasi Create
-# views.py
-def reservasi_create(request):
-    if request.method == 'POST':
-        # Ambil data dari form
-        nama_atraksi = request.POST.get('nama_atraksi')
-        tanggal = request.POST.get('tanggal')
-        jumlah_tiket = int(request.POST.get('jumlah_tiket', 0))
-
-        # Lakukan logika lainnya untuk membuat reservasi
-        # Misalnya, simpan data reservasi ke database atau model lain
-        
-        # Contoh simulasi penyimpanan reservasi
-        # Reservasi.objects.create(nama_atraksi=nama_atraksi, tanggal=tanggal, jumlah_tiket=jumlah_tiket)
-
-        # Kirim pesan sukses setelah reservasi berhasil dibuat
-        messages.success(request, "Reservasi berhasil dibuat!")
-        return redirect('reservasi_list', role='pengunjung')  # Pastikan role atau URL sudah sesuai
-
-    # Jika method GET, ambil daftar atraksi untuk dropdown
-    atraksi = [
-        {'nama_atraksi': 'Roller Coaster'},
-        {'nama_atraksi': 'Rumah Hantu'}
-    ]
-
-    # Render halaman reservasi dengan data atraksi dan role
-    return render(request, 'reservasi_create_list.html', {'atraksi': atraksi, 'role': 'pengunjung'})
-
-
-
-
-def reservasi_edit(request, nama_atraksi, tanggal):
-    # Dummy data untuk update (seharusnya ambil dari database)
-    reservasi = {
-        'nama_fasilitas': nama_atraksi,
-        'tanggal_kunjungan': tanggal,
-        'jumlah_tiket': 2,
-        'status': 'Terjadwal',
     }
+    return render(request, 'edit_reservasi.html', context)
 
-    if request.method == 'POST':
-        new_tanggal = request.POST.get('tanggal')
-        new_jumlah_tiket = int(request.POST.get('jumlah_tiket'))
 
-        # Simulasi update database (misalnya dengan ORM atau query lainnya)
-        reservasi['tanggal_kunjungan'] = new_tanggal
-        reservasi['jumlah_tiket'] = new_jumlah_tiket
 
-        # Pesan sukses
-        messages.success(request, "Reservasi berhasil diperbarui!")
-        return redirect('reservasi_list', role=request.GET.get('role', 'pengunjung'))  # Redirect berdasarkan role
+@login_required_custom
+@allowed_roles(['pengunjung','pengunjung_adopter'])
+def update_reservasi(request):
+    try:
+        if request.method == "POST":
+            username = request.session.get("username")
+            old_fasilitas = request.POST.get("old_fasilitas", "").strip()
+            old_tanggal = request.POST.get("old_tanggal", "").strip()
+            new_fasilitas = request.POST.get("nama_fasilitas", "").strip()
+            new_tanggal = parse_date(request.POST.get("tanggal_kunjungan", ""))
+            new_jumlah = request.POST.get("jumlah_tiket", "")
 
-    return render(request, 'reservasi_form.html', {
-        'reservasi': reservasi,
-        'action': 'Edit Reservasi',
-        'role': request.GET.get('role', 'pengunjung'),
+            if not (old_fasilitas and old_tanggal and new_fasilitas and new_tanggal and new_jumlah):
+                return redirect('manajemen_atraksi:list_reservasi_pengunjung')
+
+            new_jumlah = int(new_jumlah)
+
+            with connection.cursor() as cursor:
+                # Simpan dulu reservasi baru ke tabel temporer (bisa juga dummy insert rollback)
+                try:
+                    cursor.execute("""
+                        INSERT INTO RESERVASI (username_p, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status)
+                        VALUES (%s, %s, %s, %s, 'Pending')
+                    """, [username, new_fasilitas, new_tanggal, new_jumlah])
+                except DatabaseError as e:
+                    msg = str(e).splitlines()[0]
+                    encoded_msg = quote(msg)
+                    return redirect(f'/show_message/?msg={encoded_msg}&type=error&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+
+                # Kalau berhasil insert → hapus yang lama
+                cursor.execute("""
+                    DELETE FROM RESERVASI
+                    WHERE username_p = %s AND nama_fasilitas = %s AND tanggal_kunjungan = %s
+                """, [username, old_fasilitas, old_tanggal])
+
+            return redirect('manajemen_atraksi:list_reservasi_pengunjung')
+
+    except Exception as e:
+        msg = str(e).splitlines()[0]
+        encoded_msg = quote(msg)
+        return redirect(f'/show_message/?msg={encoded_msg}&type=error&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+
+@login_required_custom
+@allowed_roles(['pengunjung','pengunjung_adopter'])
+def konfirmasi_batal(request, nama_fasilitas, tanggal):
+    username = request.session.get("username")
+    tanggal_parsed = parse_date(tanggal)
+
+    return render(request, "konfirmasi_batal.html", {
+        "nama_fasilitas": nama_fasilitas,
+        "tanggal": tanggal,
     })
+    
+@login_required_custom
+@allowed_roles(['pengunjung','pengunjung_adopter'])
+def batalkan_reservasi(request, nama_fasilitas, tanggal):
+    if request.method == "POST":
+        username = request.session.get("username")
+        tanggal_parsed = parse_date(tanggal)
 
-def reservasi_delete(request, nama_atraksi, tanggal):
-    # Dummy data untuk delete (seharusnya ambil dari database)
-    reservasi = {
-        'nama_fasilitas': nama_atraksi,
-        'tanggal_kunjungan': tanggal,
-        'jumlah_tiket': 2,
-        'status': 'Terjadwal',
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                UPDATE RESERVASI
+                SET status = 'Dibatalkan'
+                WHERE username_p = %s AND nama_fasilitas = %s AND tanggal_kunjungan = %s
+            """, [username, nama_fasilitas, tanggal_parsed])
+
+        return redirect('/show_message/?msg=Reservasi berhasil dibatalkan&type=success&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+    return redirect('/show_message/?msg=Metode tidak valid&type=error&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+
+@login_required_custom
+@allowed_roles(['pengunjung','pengunjung_adopter'])
+def form_reservasi(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT nama, jadwal, kapasitas_max
+            FROM FASILITAS
+            WHERE nama IN (SELECT nama_atraksi FROM ATRAKSI)
+        """)
+        atraksi = cursor.fetchall()
+
+    context = {
+        "atraksi": atraksi
     }
+    return render(request, 'form_reservasi.html', context)
 
+from django.db import DatabaseError
+from django.shortcuts import redirect
+from main.views import show_message  # Import fungsi show_message
+from urllib.parse import quote
+@login_required_custom
+@allowed_roles(['pengunjung','pengunjung_adopter'])
+def simpan_reservasi(request):
+    if request.method == "POST":
+        try:
+            username = request.session.get("username")
+            nama_fasilitas = request.POST.get("nama_fasilitas")
+            tanggal_raw = request.POST.get("tanggal_kunjungan")
+            print("📅 Raw tanggal dari POST:", tanggal_raw)
+            tanggal_str = request.POST.get("tanggal_kunjungan")
+            tanggal = datetime.strptime(tanggal_str, "%Y-%m-%d").date()            
+            jumlah = int(request.POST.get("jumlah_tiket"))
+            print("📥 POST DATA:")
+            print("nama_fasilitas:", nama_fasilitas)
+            print("tanggal_kunjungan:", tanggal)
+            print("jumlah_tiket:", jumlah)
+
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO RESERVASI (username_p, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status)
+                    VALUES (%s, %s, %s, %s, 'Terjadwal')
+                """, [username, nama_fasilitas, tanggal, jumlah])
+
+            # Pesan sukses
+            return redirect(f'/show_message/?msg=Reservasi berhasil disimpan&type=success&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+
+        except DatabaseError as e:
+            # Ambil pesan ERROR dari exception PostgreSQL
+            msg = str(e).splitlines()[0]  # Ambil baris pertama
+            encoded_msg = quote(msg)  # Encode pesan error untuk URL
+            return redirect(f'/show_message/?msg={encoded_msg}&type=error&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+
+    
+
+@login_required_custom
+@allowed_roles(['staf admin'])
+def list_semua_reservasi(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT r.username_p, r.nama_fasilitas, f.jadwal, r.tanggal_kunjungan, 
+                   r.jumlah_tiket, r.status
+            FROM RESERVASI r
+            JOIN FASILITAS f ON r.nama_fasilitas = f.nama
+            ORDER BY r.tanggal_kunjungan DESC
+        """)
+        semua_reservasi = cursor.fetchall()
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                w.nama_wahana AS nama,
+                f.jadwal,
+                f.kapasitas_max AS kapasitas,
+                w.peraturan
+            FROM wahana w
+            JOIN fasilitas f ON w.nama_wahana = f.nama
+        """)
+        wahana_list = cursor.fetchall()
+
+    # Split peraturan by koma
+    for i in range(len(wahana_list)):
+        wahana = dict(
+            nama=wahana_list[i][0],
+            jadwal=wahana_list[i][1],
+            kapasitas=wahana_list[i][2],
+            peraturan=wahana_list[i][3].split(",") if wahana_list[i][3] else []
+        )
+        wahana_list[i] = wahana
+
+    context = {
+        "semua_reservasi": semua_reservasi,
+        "wahana_list": wahana_list,
+    }
+    return render(request, 'list_reservasi.html', context)
+
+@login_required_custom
+@allowed_roles(['staf admin'])
+def edit_status_reservasi(request, nama_fasilitas, tanggal):
     if request.method == 'POST':
-        # Simulasi delete dari database
-        # Reservasi akan dihapus di sini (misalnya dengan ORM atau query lainnya)
-        messages.success(request, "Reservasi berhasil dibatalkan!")
-        return redirect('reservasi_list', role=request.GET.get('role', 'pengunjung'))  # Redirect sesuai role
+        status_baru = request.POST.get('status')
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                UPDATE RESERVASI 
+                SET status = %s
+                WHERE nama_fasilitas = %s AND tanggal_kunjungan = %s
+            """, [status_baru, nama_fasilitas, tanggal])
+        return redirect('manajemen_atraksi:list_semua_reservasi')
 
-    return render(request, 'reservasi_confirm_delete.html', {
-        'nama_atraksi': nama_atraksi,
-        'tanggal': tanggal,
-    })
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT r.username_p, r.nama_fasilitas, r.tanggal_kunjungan, r.status
+            FROM RESERVASI r
+            WHERE r.nama_fasilitas = %s AND r.tanggal_kunjungan = %s
+        """, [nama_fasilitas, tanggal])
+        data = cursor.fetchone()
+
+    if not data:
+        return redirect('manajemen_atraksi:list_semua_reservasi')
+
+    context = {
+        "reservasi": {
+            "username": data[0],
+            "fasilitas": data[1],
+            "tanggal": data[2],
+            "status": data[3],
+        }
+    }
+    return render(request, 'edit_status_reservasi.html', context)
+
+from datetime import datetime
+
+# @login_required_custom
+# def create_reservasi(request):
+#     if request.method == "POST":
+#         username = request.session.get("username")
+#         nama_fasilitas = request.POST.get("nama_fasilitas")
+#         tanggal_str = request.POST.get("tanggal_kunjungan")
+#         jumlah_tiket = request.POST.get("jumlah_tiket")
+#         print("📥 POST DATA:")
+#         print("nama_fasilitas:", nama_fasilitas)
+#         print("tanggal_kunjungan:", tanggal_str)
+#         print("jumlah_tiket:", jumlah_tiket)
+
+#         if not nama_fasilitas or not tanggal_str or not jumlah_tiket:
+#             return redirect('/show_message/?msg=Data tidak lengkap&type=warning&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+
+#         try:
+#             # Gunakan datetime.strptime agar dapat mendeteksi error format
+#             tanggal = datetime.strptime(tanggal_str, "%Y-%m-%d").date()
+#             jumlah = int(jumlah_tiket)
+
+#             with connection.cursor() as cursor:
+#                 cursor.execute("""
+#                     INSERT INTO RESERVASI (username_p, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status)
+#                     VALUES (%s, %s, %s, %s, 'Terjadwal')
+#                 """, [username, nama_fasilitas, tanggal, jumlah])
+
+#             return redirect('/show_message/?msg=Reservasi berhasil dibuat&type=success&next_url=manajemen_atraksi:list_reservasi_pengunjung')
+
+#         except ValueError:
+#             return redirect('/show_message/?msg=Format tanggal tidak valid&type=warning&next_url=manajemen_atraksi:form_reservasi')
+#         except DatabaseError as e:
+#             msg = str(e).splitlines()[0]
+#             return redirect(f'/show_message/?msg={quote(msg)}&type=error&next_url=manajemen_atraksi:form_reservasi')
+
+#     return redirect('manajemen_atraksi:form_reservasi')

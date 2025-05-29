@@ -1,10 +1,13 @@
+from gettext import translation
+from pyexpat.errors import messages
 from shlex import quote
+from urllib.parse import quote_plus
 import uuid
 from datetime import date, timedelta
 from collections import defaultdict
 from datetime import datetime
 from django.shortcuts import render, redirect
-from django.db import connection
+from django.db import IntegrityError, connection
 from django.utils import timezone
 from django.utils.dateformat import DateFormat
 
@@ -678,52 +681,215 @@ def extend_adopsi(request, id_adopter, id_hewan, tgl_mulai_adopsi):
 # ————————————————————
 # 6–9. Statistik & Riwayat Adopter (Admin)
 # ————————————————————
+from urllib.parse import quote_plus
+from django.db import connection, IntegrityError, transaction as db_tx
 
 @login_required_custom
 @allowed_roles(['staf admin'])
 def daftar_adopter(request):
-    totals = defaultdict(int)
-    records_map = defaultdict(list)
-    with connection.cursor() as cur:
-        cur.execute("SELECT * FROM get_all_adopsi()")
-        rows = cur.fetchall()
-    for r in rows:
-        # r = (id_adopter, id_hewan, tgl_mulai, tgl_berhenti, kontribusi, status_pembayaran)
-        adopter = r[0]
-        if adopter and r[5] == 'lunas':
-            totals[adopter] += r[4]
-            records_map[adopter].append({
-                'id_hewan':     r[1],
-                'tgl_mulai':    r[2],
-                'tgl_berhenti': r[3],
-                'kontribusi':   r[4],
-            })
-    adopters_list = [
-        {'adopter': name, 'total': totals[name], 'records': records_map[name]}
-        for name in totals
-    ]
-    adopters_list.sort(key=lambda x: x['total'], reverse=True)
-    return render(request, 'halaman_daftar_adopter.html', {
-        'role': get_user_role(request.session.get('username')),
-        'adopters_list': adopters_list
-    })
+    # =================================================
+    # A.  HANDLE POST  ➜ hapus adopter
+    # =================================================
+    if request.method == "POST":
+        adopter_id = request.POST.get("adopter_id")
+        if adopter_id:
+            try:
+                with db_tx.atomic(), connection.cursor() as cur:
+                    # 1️⃣  Hapus relasi individu / organisasi (kalau ada)
+                    cur.execute("DELETE FROM individu   WHERE id_adopter = %s",
+                                [adopter_id])
+                    cur.execute("DELETE FROM organisasi WHERE id_adopter = %s",
+                                [adopter_id])
 
+                    # 2️⃣  Cek adopsi AKTIF
+                    cur.execute("""
+                        SELECT 1
+                        FROM adopsi
+                        WHERE id_adopter = %s
+                        AND CURRENT_DATE BETWEEN tgl_mulai_adopsi
+                                            AND tgl_berhenti_adopsi
+                        LIMIT 1
+                    """, [adopter_id])
+                    if cur.fetchone():
+                        raise ValueError(
+                            "Adopter masih aktif berpartisipasi. "
+                            "Data tidak bisa dihapus."
+                        )
+
+                    # 3️⃣  Hapus adopsi selesai & lunas
+                    cur.execute("""
+                        DELETE FROM adopsi
+                        WHERE id_adopter = %s
+                        AND status_pembayaran ILIKE 'lunas'
+                        AND CURRENT_DATE > tgl_berhenti_adopsi
+                    """, [adopter_id])
+
+                    # 4️⃣  Hapus adopter (sekarang FK sudah bersih)
+                    cur.execute("DELETE FROM adopter WHERE id_adopter = %s",
+                                [adopter_id])
+
+            except IntegrityError:
+                msg = ("Adopter masih terhubung dengan data lain. "
+                    "Pastikan semua relasi sudah dihapus.")
+                return redirect(
+                    f"/show_message/?msg={quote_plus(msg)}"
+                    f"&type=error&next_url=daftar_adopter"
+                )
+            except ValueError as e:
+                return redirect(
+                    f"/show_message/?msg={quote_plus(str(e))}"
+                    f"&type=warning&next_url=daftar_adopter"
+                )
+
+            msg = "Adopter dan data terkait berhasil dihapus."
+            return redirect(
+                f"/show_message/?msg={quote_plus(msg)}"
+                f"&type=success&next_url=daftar_adopter"
+            )
+
+
+
+    # =================================================
+    # B.  GET  ➜ tampilkan daftar
+    # =================================================
+    with connection.cursor() as cur:
+        cur.execute("SELECT * FROM v_adopter_stats")
+        rows = cur.fetchall()
+        # kolom: (id_adopter, nama, tipe, total_lunas, last_year_lunas, masih_aktif)
+
+    individu, organisasi = [], []
+    for r in rows:
+        data = {
+            "id":    r[0],
+            "nama":  r[1],
+            "total": r[3] or 0,
+            "aktif": r[5],
+        }
+        (individu if r[2] == "individu" else organisasi).append(data)
+
+    # ---------- TOP-5 hanya yg punya last_year_lunas > 0 ----------
+    tahun_ini = [r for r in rows if (r[4] or 0) > 0]
+    tahun_ini.sort(key=lambda r: r[4], reverse=True)
+    top5 = [{"nama": r[1], "total": r[4]} for r in tahun_ini[:5]]
+
+    return render(request, "halaman_daftar_adopter.html", {
+        "role":                 get_user_role(request.session.get("username")),
+        "adopters_individu":    individu,
+        "adopters_organisasi":  organisasi,
+        "top5":                 top5,                 # ← bisa kosong []
+    })
 
 @login_required_custom
 @allowed_roles(['staf admin'])
 def riwayat_adopsi_adopter(request, id_adopter):
+
+    # ===============================================================
+    # A.  HANDLE POST  → hapus adopsi
+    # ===============================================================
+    if request.method == "POST":
+        id_hewan   = request.POST.get("id_hewan")
+        tgl_mulai  = request.POST.get("tgl_mulai")        # YYYY-MM-DD
+
+        try:
+            with connection.cursor() as cur:
+                # pastikan baris itu memang boleh dihapus
+                cur.execute("""
+                    SELECT 1
+                      FROM adopsi
+                     WHERE id_adopter = %s
+                       AND id_hewan   = %s
+                       AND tgl_mulai_adopsi = %s
+                       AND status_pembayaran ILIKE 'lunas'
+                       AND CURRENT_DATE > tgl_berhenti_adopsi
+                     LIMIT 1
+                """, [id_adopter, id_hewan, tgl_mulai])
+
+                if not cur.fetchone():
+                    raise ValueError("Data adopsi masih berlangsung "
+                                     "atau belum lunas.")
+
+                # hapus
+                cur.execute("""
+                    DELETE FROM adopsi
+                     WHERE id_adopter = %s
+                       AND id_hewan   = %s
+                       AND tgl_mulai_adopsi = %s
+                """, [id_adopter, id_hewan, tgl_mulai])
+
+        except ValueError as e:
+            return redirect(
+                f"/show_message/?msg={quote_plus(str(e))}"
+                f"&type=warning&next_url=/riwayat-adopsi/{id_adopter}/"
+            )
+        except IntegrityError:
+            msg = "Gagal menghapus. Silakan coba lagi."
+            return redirect(
+                f"/show_message/?msg={quote_plus(msg)}"
+                f"&type=error&next_url=/riwayat-adopsi/{id_adopter}/"
+            )
+
+        # sukses
+        return redirect(
+            f"/show_message/?msg={quote_plus('Data adopsi berhasil dihapus.')}"
+            f"&type=success&next_url=/riwayat-adopsi/{id_adopter}/"
+        )
+
+    # ===============================================================
+    # B.  GET  → tampilkan riwayat
+    # ===============================================================
     with connection.cursor() as cur:
-        cur.execute("SELECT * FROM get_adopsi_by_adopter(%s)", [id_adopter])
+        # — info kontak adopter —
+        cur.execute("""
+            SELECT
+              COALESCE(i.nama, o.nama_organisasi)      AS nama,
+              p.alamat,
+              g.no_telepon
+            FROM adopter ad
+            LEFT JOIN individu   i ON i.id_adopter = ad.id_adopter
+            LEFT JOIN organisasi o ON o.id_adopter = ad.id_adopter
+            LEFT JOIN pengunjung p ON p.username_p  = ad.username_adopter
+            LEFT JOIN pengguna   g ON g.username    = ad.username_adopter
+            WHERE ad.id_adopter = %s
+            LIMIT 1
+        """, [id_adopter])
+        contact_row = cur.fetchone() or ("-", "-", "-")
+        contact = {
+            "nama":       contact_row[0],
+            "alamat":     contact_row[1],
+            "no_telepon": contact_row[2],
+        }
+
+        # — daftar adopsi lunas (selesai & berlangsung) —
+        cur.execute("""
+            SELECT
+              h.nama,
+              h.spesies,
+              a.id_hewan,
+              a.tgl_mulai_adopsi,
+              a.tgl_berhenti_adopsi,
+              a.kontribusi_finansial
+            FROM adopsi a
+            JOIN hewan h ON h.id = a.id_hewan
+            WHERE a.id_adopter = %s
+              AND a.status_pembayaran ILIKE 'lunas'
+            ORDER BY a.tgl_mulai_adopsi DESC
+        """, [id_adopter])
         rows = cur.fetchall()
-    recs = [{
-        'id_hewan':     r[1],
-        'tgl_mulai':    r[2],
-        'tgl_berhenti': r[3],
-        'kontribusi':   r[4],
-        'status':       r[5],
+
+    records = [{
+        "nama_hewan"  : r[0],
+        "jenis"       : r[1],
+        "id_hewan"    : r[2],
+        "tgl_mulai"   : r[3],
+        "tgl_berhenti": r[4],
+        "kontribusi"  : r[5],
+        "boleh_hapus" : date.today() > r[4],     # true kalau periode selesai
     } for r in rows]
-    return render(request, 'halaman_riwayat_adopsi_adopter.html', {
-        'role': get_user_role(request.session.get('username')),
-        'adopter': id_adopter,
-        'records': recs
+
+    return render(request, "halaman_riwayat_adopsi_adopter.html", {
+        "role"    : get_user_role(request.session.get("username")),
+        "contact" : contact,
+        "records" : records,
+        "today"   : date.today(),
+        "id_adopter": id_adopter,               # utk path kembali
     })
