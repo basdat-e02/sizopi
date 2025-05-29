@@ -208,6 +208,7 @@ def view_jadwal_pemeriksaan(request):
 
     if request.method == "POST":
         id_hewan = request.POST.get("id_hewan")
+        print(id_hewan)
         tanggal_awal = request.POST.get("tanggal_awal")
         frekuensi = int(request.POST.get("frekuensi"))
 

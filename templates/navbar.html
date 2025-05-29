@@ -27,7 +27,8 @@
  
        {# ============== MENU SPESIFIK ROLE ============= #}
        {% if role == "dokter hewan" %}
-         <li><a class="nav-link">Rekam Medis</a></li>
+         <li><a href="{% url 'rekam_medis' %}" class="nav-link">Rekam Medis</a></li>
+         <li><a href="{% url 'jadwal_pemeriksaan' %}" class="nav-link">Jadwal Pemeriksaaan</a></li>
          <li><a href="{% url 'view_satwa' %}" class="nav-link">Data Satwa</a></li>
 
  
