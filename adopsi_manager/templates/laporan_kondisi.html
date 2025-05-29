@@ -1,54 +1,55 @@
 {% extends "base.html" %}
 {% block meta %}<title>Laporan Kondisi Satwa</title>{% endblock meta %}
-{% load humanize %}
 {% block content %}
 {% include "navbar.html" %}
 
-<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-6">
-  <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Laporan Kondisi Satwa</h1>
+<div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-10">
+  <h2 class="text-xl font-bold text-center mb-4">Laporan Kondisi Satwa</h2>
 
-    <div class="mb-6">
-      <img src="{{ adopsi.foto_url }}" alt="{{ adopsi.nama_hewan }}"
-           class="w-full h-64 object-cover rounded mb-4">
-      <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">{{ adopsi.nama_hewan }} ({{ adopsi.jenis }})</h2>
-      <p class="text-gray-600 dark:text-gray-300">Periode adopsi: {{ adopsi.tgl_mulai }} &ndash; {{ adopsi.tgl_berhenti }}</p>
+  <div class="flex items-center mb-6">
+    <img src="{{ foto_url }}" alt="{{ nama_hewan }}"
+         class="w-24 h-24 object-cover rounded mr-6">
+    <div>
+      <p><strong>Nama:</strong> {{ nama_hewan }}</p>
+      <p><strong>Jenis:</strong> {{ jenis }}</p>
+      <p><strong>Habitat:</strong> {{ habitat }}</p>
     </div>
+  </div>
 
-    <table class="w-full text-sm text-gray-700 dark:text-gray-300 border mb-8">
-      <thead class="bg-gray-200 dark:bg-gray-700 font-semibold">
+  <h3 class="font-semibold mb-2">Rekam Medis Satwa</h3>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left border">
+      <thead class="bg-gray-200 dark:bg-gray-700">
         <tr>
-          <th class="border px-4 py-2">Tanggal</th>
-          <th class="border px-4 py-2">Dokter</th>
-          <th class="border px-4 py-2">Status</th>
-          <th class="border px-4 py-2">Diagnosa</th>
-          <th class="border px-4 py-2">Pengobatan</th>
-          <th class="border px-4 py-2">Tindak Lanjut</th>
+          <th class="px-3 py-2">Tanggal</th>
+          <th class="px-3 py-2">Nama Dokter</th>
+          <th class="px-3 py-2">Status Kesehatan</th>
+          <th class="px-3 py-2">Diagnosa</th>
+          <th class="px-3 py-2">Pengobatan</th>
+          <th class="px-3 py-2">Catatan Lanjut</th>
         </tr>
       </thead>
       <tbody>
-        {% for m in rekam_medis %}
-        <tr>
-          <td class="border px-4 py-2">{{ m.tanggal }}</td>
-          <td class="border px-4 py-2">{{ m.dokter }}</td>
-          <td class="border px-4 py-2">{{ m.status }}</td>
-          <td class="border px-4 py-2">{{ m.diagnosa }}</td>
-          <td class="border px-4 py-2">{{ m.pengobatan }}</td>
-          <td class="border px-4 py-2">{{ m.tindak_lanjut }}</td>
+        {% for m in riwayat_medis %}
+        <tr class="border-t">
+          <td class="px-3 py-2">{{ m.tanggal }}</td>
+          <td class="px-3 py-2">{{ m.dokter }}</td>
+          <td class="px-3 py-2">{{ m.status }}</td>
+          <td class="px-3 py-2">{{ m.diagnosa }}</td>
+          <td class="px-3 py-2">{{ m.pengobatan }}</td>
+          <td class="px-3 py-2">{{ m.catatan }}</td>
         </tr>
         {% empty %}
-        <tr>
-          <td colspan="6" class="border px-4 py-2 text-center text-gray-600 dark:text-gray-400">
-            Belum ada rekam medis setelah periode adopsi.
-          </td>
-        </tr>
+        <tr><td colspan="6" class="px-3 py-2 text-center">Belum ada data medis.</td></tr>
         {% endfor %}
       </tbody>
     </table>
+  </div>
 
-    <a href="{% url 'detail_adopsi_adopter' adopsi.id %}"
-       class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold">
-      Kembali ke Detail Adopsi
+  <div class="mt-6 text-center">
+    <a href="{% url 'detail_adopsi_adopter' id_adopter id_hewan tgl_mulai_adopsi %}"
+       class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+      Kembali
     </a>
   </div>
 </div>
